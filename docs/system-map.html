@@ -1,0 +1,720 @@
+<title>BDMF System Map</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground: #F7F6F9;
+    --surface: #FFFFFF;
+    --ink: #1A0B3D;
+    --body: #33294F;
+    --muted: #6E6688;
+    --faint: #A29BB8;
+    --rule: #DCD7E7;
+    --hair: #EBE8F2;
+    --accent: #3A1E8C;
+    --open: #4E7F14;
+    --open-soft: #EEF6E2;
+    --outside: #8F5A0E;
+    --outside-soft: #FBF2E2;
+    --stop: #9B1C33;
+
+    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #100A24;
+      --surface: #191231;
+      --ink: #EFECF8;
+      --body: #C9C3DE;
+      --muted: #9A93B4;
+      --faint: #6B6489;
+      --rule: #322A50;
+      --hair: #251D40;
+      --accent: #A896F0;
+      --open: #9BD14A;
+      --open-soft: #1E2A12;
+      --outside: #E0A845;
+      --outside-soft: #2C2110;
+      --stop: #F08098;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #100A24;
+    --surface: #191231;
+    --ink: #EFECF8;
+    --body: #C9C3DE;
+    --muted: #9A93B4;
+    --faint: #6B6489;
+    --rule: #322A50;
+    --hair: #251D40;
+    --accent: #A896F0;
+    --open: #9BD14A;
+    --open-soft: #1E2A12;
+    --outside: #E0A845;
+    --outside-soft: #2C2110;
+    --stop: #F08098;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--body);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(0, 1fr)
+      [main-start] min(66ch, 100%) [main-end]
+      minmax(0, 1fr) [full-end];
+  }
+  .page > * { grid-column: main; }
+  .page > figure { grid-column: full; justify-self: center; width: min(1080px, 100%); }
+
+  header { padding: 72px 0 0; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 52px);
+    line-height: 1.02;
+    letter-spacing: -.025em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin: 0 0 18px;
+  }
+  .standfirst {
+    font-size: 19px;
+    color: var(--muted);
+    margin: 0 0 34px;
+    text-wrap: pretty;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin: 64px 0 8px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+  }
+  h2 .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--faint);
+    letter-spacing: 0;
+    margin-right: 12px;
+    vertical-align: 3px;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--ink);
+    margin: 36px 0 6px;
+  }
+  p { margin: 0 0 16px; text-wrap: pretty; }
+  strong { font-weight: 600; color: var(--ink); }
+  code {
+    font-family: var(--mono);
+    font-size: .86em;
+    color: var(--accent);
+    background: var(--hair);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  figure {
+    margin: 34px 0 10px;
+    padding: 0;
+  }
+  .frame {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 26px 22px;
+    overflow-x: auto;
+  }
+  figure svg { display: block; width: 100%; min-width: 720px; height: auto; }
+  figcaption {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-top: 14px;
+    padding-left: 2px;
+    max-width: 78ch;
+    text-wrap: pretty;
+  }
+  figcaption b { font-family: var(--sans); font-weight: 600; color: var(--ink); font-size: 13px; }
+
+  /* ---- shared SVG vocabulary ---- */
+  .box { fill: var(--surface); stroke: var(--rule); stroke-width: 1.25; }
+  .box-key { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+  .box-open { fill: var(--open-soft); stroke: var(--open); stroke-width: 1.4; }
+  .box-out { fill: var(--outside-soft); stroke: var(--outside); stroke-width: 1.4; }
+  .zone { fill: none; stroke-width: 1.25; stroke-dasharray: 5 4; }
+  .zone-ws { stroke: var(--accent); }
+  .zone-out { stroke: var(--outside); }
+  .zone-oz { stroke: var(--muted); }
+
+  .t-name { font-family: var(--sans); font-size: 13px; font-weight: 600; fill: var(--ink); }
+  .t-route { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+  .t-zone {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; fill: var(--accent);
+  }
+  .t-zone-out { fill: var(--outside); }
+  .t-zone-oz { fill: var(--muted); }
+  .t-edge { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+  .t-edge-open { fill: var(--open); }
+  .t-edge-stop { fill: var(--stop); }
+  .t-small { font-family: var(--sans); font-size: 11px; fill: var(--muted); }
+
+  .edge { fill: none; stroke: var(--rule); stroke-width: 1.25; }
+  .edge-firm { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+  .edge-open { fill: none; stroke: var(--open); stroke-width: 1.6; }
+  .edge-back { fill: none; stroke: var(--stop); stroke-width: 1.25; stroke-dasharray: 4 4; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 22px;
+    font-family: var(--sans); font-size: 12.5px; color: var(--muted);
+    margin: 16px 0 0; padding: 0; list-style: none;
+  }
+  .legend li { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 22px; height: 0; border-top-width: 2px; border-top-style: solid; flex: none; }
+  .sw-open { border-color: var(--open); }
+  .sw-back { border-color: var(--stop); border-top-style: dashed; }
+  .sw-zone { border-color: var(--accent); border-top-style: dashed; }
+  .sw-out { border-color: var(--outside); border-top-style: dashed; }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 20px 0 8px;
+    font-family: var(--sans); font-size: 13.5px;
+  }
+  th {
+    text-align: left; font-weight: 600; color: var(--muted);
+    font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--rule); padding: 0 14px 8px 0;
+  }
+  td { padding: 11px 14px 11px 0; border-bottom: 1px solid var(--hair); vertical-align: top; color: var(--body); }
+  td:first-child { font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+  .tw { overflow-x: auto; }
+
+  .note {
+    border-left: 2px solid var(--accent);
+    padding: 2px 0 2px 18px;
+    margin: 24px 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  .note b { color: var(--ink); font-family: var(--sans); font-size: 14px; font-weight: 600; }
+
+  footer {
+    margin-top: 72px; padding-top: 22px; border-top: 1px solid var(--rule);
+    font-family: var(--sans); font-size: 12.5px; color: var(--faint);
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="page">
+
+  <header>
+    <p class="eyebrow">OZ Global B2B · Business-Driven Marketing Focus</p>
+    <h1>BDMF System Map</h1>
+    <p class="standfirst">
+      Two drawings of the same platform. The first shows what exists and which walls separate it;
+      the second shows what the system decides, and what it refuses.
+    </p>
+  </header>
+
+  <h2><span class="num">01</span>What exists</h2>
+
+  <p>
+    BDMF is one installation serving many client companies. The structure below is not really a
+    hierarchy of pages — it is a hierarchy of <strong>walls</strong>. Three zones, each of which
+    can see strictly less than the one outside it.
+  </p>
+
+  <figure>
+    <div class="frame">
+      <svg viewBox="0 0 920 700" role="img"
+           aria-label="Structure tree: the OZ back office and client workspaces are siblings under the platform. A client workspace contains the projects dashboard, a project with four stage routes, and a separate contributor surface reachable without an account.">
+        <defs>
+          <marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"></path>
+          </marker>
+        </defs>
+
+        <!-- root -->
+        <rect class="box-key" x="24" y="24" width="212" height="46" rx="7"></rect>
+        <text class="t-name" x="40" y="45">BDMF platform</text>
+        <text class="t-route" x="40" y="61">one installation</text>
+
+        <!-- spine from root -->
+        <path class="edge" d="M 46 70 L 46 262"></path>
+
+        <!-- child: OZ back office -->
+        <path class="edge" d="M 46 128 L 74 128"></path>
+        <rect class="box" x="74" y="106" width="228" height="46" rx="7"></rect>
+        <text class="t-name" x="90" y="127">OZ back office</text>
+        <text class="t-route" x="90" y="143">/oz</text>
+        <text class="t-small" x="318" y="123">Every workspace on the installation.</text>
+        <text class="t-small" x="318" y="140">Metadata and health only — never client content.</text>
+
+        <!-- zone: client workspace -->
+        <rect class="zone zone-ws" x="74" y="186" width="822" height="490" rx="10"></rect>
+        <text class="t-zone" x="92" y="209">Client workspace — one tenant, invisible to every other</text>
+        <path class="edge" d="M 46 262 L 74 262"></path>
+
+        <!-- inner spine -->
+        <path class="edge" d="M 106 226 L 106 566"></path>
+
+        <!-- projects dashboard -->
+        <path class="edge" d="M 106 262 L 134 262"></path>
+        <rect class="box-key" x="134" y="240" width="228" height="46" rx="7"></rect>
+        <text class="t-name" x="150" y="261">Projects dashboard</text>
+        <text class="t-route" x="150" y="277">/</text>
+        <text class="t-small" x="378" y="257">Start · rename · archive · delete.</text>
+        <text class="t-small" x="378" y="274">Many projects, each a separate run of the method.</text>
+
+        <!-- project -->
+        <path class="edge" d="M 166 286 L 166 356"></path>
+        <path class="edge" d="M 166 356 L 194 356"></path>
+        <rect class="box" x="194" y="334" width="228" height="46" rx="7"></rect>
+        <text class="t-name" x="210" y="355">Project overview</text>
+        <text class="t-route" x="210" y="371">/p/[id]</text>
+        <text class="t-small" x="438" y="351">Stage 1 lives here: the account,</text>
+        <text class="t-small" x="438" y="368">and everyone taking part.</text>
+
+        <!-- stage rail -->
+        <path class="edge" d="M 226 380 L 226 414"></path>
+        <path class="edge" d="M 226 414 L 748 414"></path>
+        <path class="edge" d="M 226 414 L 226 438"></path>
+        <path class="edge" d="M 400 414 L 400 438"></path>
+        <path class="edge" d="M 574 414 L 574 438"></path>
+        <path class="edge" d="M 748 414 L 748 438"></path>
+
+        <rect class="box" x="156" y="438" width="140" height="52" rx="7"></rect>
+        <text class="t-route" x="170" y="458">stage 2</text>
+        <text class="t-name" x="170" y="476">Direction</text>
+
+        <rect class="box" x="330" y="438" width="140" height="52" rx="7"></rect>
+        <text class="t-route" x="344" y="458">stage 3</text>
+        <text class="t-name" x="344" y="476">Long list</text>
+
+        <rect class="box" x="504" y="438" width="140" height="52" rx="7"></rect>
+        <text class="t-route" x="518" y="458">stage 4</text>
+        <text class="t-name" x="518" y="476">Deep dive</text>
+
+        <rect class="box" x="678" y="438" width="140" height="52" rx="7"></rect>
+        <text class="t-route" x="692" y="458">stage 5</text>
+        <text class="t-name" x="692" y="476">Annual plan</text>
+
+        <text class="t-route" x="170" y="510">/direction</text>
+        <text class="t-route" x="344" y="510">/longlist</text>
+        <text class="t-route" x="518" y="510">/deepdive</text>
+        <text class="t-route" x="692" y="510">/plan</text>
+
+        <text class="t-small" x="344" y="530">list · people · ranking</text>
+        <text class="t-small" x="518" y="530">assign · track · read</text>
+
+        <!-- zone: contributor surface -->
+        <path class="edge" d="M 106 566 L 134 566"></path>
+        <rect class="zone zone-out" x="134" y="566" width="740" height="92" rx="10"></rect>
+        <text class="t-zone t-zone-out" x="150" y="588">Contributor surface — one task, no project shell</text>
+
+        <rect class="box-out" x="150" y="600" width="196" height="44" rx="7"></rect>
+        <text class="t-name" x="164" y="620">The invited task</text>
+        <text class="t-route" x="164" y="635">/t/[token]</text>
+
+        <rect class="box-out" x="366" y="600" width="196" height="44" rx="7"></rect>
+        <text class="t-name" x="380" y="620">My own tasks</text>
+        <text class="t-route" x="380" y="635">/tasks</text>
+
+        <text class="t-small" x="582" y="617">No account needed. The link is the credential,</text>
+        <text class="t-small" x="582" y="634">and it opens one page only.</text>
+      </svg>
+    </div>
+    <figcaption>
+      <b>Figure 1 · Three zones, not three menus.</b>
+      The nesting is the access rule. A client workspace cannot see another workspace, a
+      contributor cannot see the project that assigned them, and the OZ back office — which sits
+      outside every workspace — sees that they exist without seeing what is in them.
+    </figcaption>
+  </figure>
+
+  <ul class="legend">
+    <li><span class="swatch sw-zone"></span> Tenant boundary</li>
+    <li><span class="swatch sw-out"></span> Reachable without an account</li>
+  </ul>
+
+  <h2><span class="num">02</span>Who gets in</h2>
+
+  <p>
+    Every request resolves through the same four questions before a single row of client data is
+    read. Note where the tree does <em>not</em> branch: there is no path from a contributor's link
+    to a project, and no path from one workspace to another.
+  </p>
+
+  <figure>
+    <div class="frame">
+      <svg viewBox="0 0 1000 530" role="img"
+           aria-label="Access decision tree: a request is asked whether it carries a session, whether it carries a task link, whether that token is live, and whether the account administers a workspace. Six terminal outcomes result.">
+        <defs>
+          <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"></path>
+          </marker>
+        </defs>
+
+        <!-- start -->
+        <rect class="box-key" x="16" y="204" width="140" height="46" rx="23"></rect>
+        <text class="t-name" x="38" y="232">A request</text>
+
+        <!-- D1 signed in -->
+        <path class="edge-firm" d="M 156 227 L 196 227" marker-end="url(#a2)"></path>
+        <polygon class="box" points="200,227 288,195 376,227 288,259"></polygon>
+        <text class="t-name" x="288" y="231" text-anchor="middle">Signed in?</text>
+
+        <!-- D1 no -> D2 -->
+        <path class="edge-firm" d="M 288 195 L 288 130 L 396 130" marker-end="url(#a2)"></path>
+        <text class="t-edge" x="298" y="150">no</text>
+
+        <!-- D1 yes -> D3 -->
+        <path class="edge-firm" d="M 288 259 L 288 358 L 396 358" marker-end="url(#a2)"></path>
+        <text class="t-edge t-edge-open" x="298" y="316">yes</text>
+
+        <!-- D2 task link -->
+        <polygon class="box" points="400,130 488,100 576,130 488,160"></polygon>
+        <text class="t-name" x="488" y="134" text-anchor="middle">Task link?</text>
+
+        <!-- D2 no -> sign in -->
+        <path class="edge-firm" d="M 488 100 L 488 46 L 776 46" marker-end="url(#a2)"></path>
+        <text class="t-edge" x="498" y="66">no</text>
+        <rect class="box" x="780" y="24" width="184" height="44" rx="7"></rect>
+        <text class="t-name" x="796" y="43">Sign in</text>
+        <text class="t-route" x="796" y="59">/login · /register</text>
+
+        <!-- D2 yes -> D4 -->
+        <path class="edge-firm" d="M 576 130 L 616 130" marker-end="url(#a2)"></path>
+        <text class="t-edge t-edge-open" x="580" y="122">yes</text>
+        <polygon class="box" points="620,130 700,102 780,130 700,158"></polygon>
+        <text class="t-name" x="700" y="134" text-anchor="middle">Token live?</text>
+
+        <!-- D4 no -> error -->
+        <path class="edge-firm" d="M 700 158 L 700 186 L 776 186" marker-end="url(#a2)"></path>
+        <text class="t-edge t-edge-stop" x="708" y="180">no</text>
+        <rect class="box" x="780" y="164" width="184" height="44" rx="7"></rect>
+        <text class="t-name" x="796" y="183">That link does not work</text>
+        <text class="t-route" x="796" y="199">unknown · expired · revoked</text>
+
+        <!-- D4 yes -> the task -->
+        <path class="edge-open" d="M 700 102 L 700 96 L 776 96" marker-end="url(#a2)"></path>
+        <text class="t-edge t-edge-open" x="708" y="90">yes</text>
+        <rect class="box-out" x="780" y="74" width="184" height="44" rx="7"></rect>
+        <text class="t-name" x="796" y="93">Exactly one task</text>
+        <text class="t-route" x="796" y="109">score · or write a plan</text>
+
+        <!-- D3 workspace admin -->
+        <polygon class="box" points="400,358 500,326 600,358 500,390"></polygon>
+        <text class="t-name" x="500" y="362" text-anchor="middle">Admin of a workspace?</text>
+
+        <!-- D3 no -> tasks -->
+        <path class="edge-firm" d="M 500 326 L 500 272 L 776 272" marker-end="url(#a2)"></path>
+        <text class="t-edge" x="510" y="292">no</text>
+        <rect class="box-out" x="780" y="250" width="184" height="44" rx="7"></rect>
+        <text class="t-name" x="796" y="269">My own tasks only</text>
+        <text class="t-route" x="796" y="285">/tasks</text>
+
+        <!-- D3 yes -> dashboard -->
+        <path class="edge-open" d="M 600 358 L 776 358" marker-end="url(#a2)"></path>
+        <text class="t-edge t-edge-open" x="608" y="350">yes</text>
+        <rect class="box-open" x="780" y="336" width="184" height="44" rx="7"></rect>
+        <text class="t-name" x="796" y="355">That workspace only</text>
+        <text class="t-route" x="796" y="371">/  → /p/[id] → stages</text>
+
+        <!-- D5 platform admin -->
+        <path class="edge-firm" d="M 500 390 L 500 448 L 396 448" marker-end="url(#a2)"></path>
+        <text class="t-edge" x="510" y="412">and separately</text>
+        <polygon class="box" points="392,448 300,420 208,448 300,476"></polygon>
+        <text class="t-name" x="300" y="452" text-anchor="middle">OZ staff?</text>
+
+        <path class="edge-firm" d="M 300 476 L 300 502 L 776 502" marker-end="url(#a2)"></path>
+        <text class="t-edge t-edge-open" x="310" y="496">yes</text>
+        <rect class="box" x="780" y="480" width="184" height="44" rx="7"></rect>
+        <text class="t-name" x="796" y="499">The back office</text>
+        <text class="t-route" x="796" y="515">/oz</text>
+      </svg>
+    </div>
+    <figcaption>
+      <b>Figure 2 · Four questions, six outcomes.</b>
+      Every one of these is answered on the server, from the session and the membership rows —
+      never from the URL and never from what the interface happens to show. A project id belonging
+      to another tenant is indistinguishable from a project id that does not exist: both return
+      <em>not found</em>.
+    </figcaption>
+  </figure>
+
+  <div class="note">
+    <b>Why a token and not a password.</b>
+    A chief executive asked to score thirteen initiatives should not have to create an account to
+    do it. The invitation link is a single-purpose credential, stored only as a hash, scoped to one
+    page, and expiring. Nothing about it can be widened into access to the project.
+  </div>
+
+  <h2><span class="num">03</span>What unlocks what</h2>
+
+  <p>
+    The five stages are not tabs. Each one is gated on a decision the admin has to take
+    deliberately, and two of those gates are expensive to reverse.
+  </p>
+
+  <figure>
+    <div class="frame">
+      <svg viewBox="0 0 960 360" role="img"
+           aria-label="Stage gate diagram: access leads to business direction, which unlocks the long list once confirmed. Approving the shortlist unlocks both the deep dive and the annual plan. Reopening the shortlist discards every deep dive task.">
+        <defs>
+          <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--open)"></path>
+          </marker>
+          <marker id="a3b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--stop)"></path>
+          </marker>
+        </defs>
+
+        <rect class="box" x="16" y="132" width="150" height="60" rx="7"></rect>
+        <text class="t-route" x="32" y="154">stage 1</text>
+        <text class="t-name" x="32" y="174">Access &amp; people</text>
+
+        <path class="edge-open" d="M 166 162 L 214 162" marker-end="url(#a3)"></path>
+
+        <rect class="box" x="218" y="132" width="150" height="60" rx="7"></rect>
+        <text class="t-route" x="234" y="154">stage 2</text>
+        <text class="t-name" x="234" y="174">Direction</text>
+
+        <path class="edge-open" d="M 368 162 L 424 162" marker-end="url(#a3)"></path>
+        <text class="t-edge t-edge-open" x="360" y="146">confirm stage 2</text>
+
+        <rect class="box" x="428" y="132" width="164" height="60" rx="7"></rect>
+        <text class="t-route" x="444" y="154">stage 3</text>
+        <text class="t-name" x="444" y="174">Long list &amp; scoring</text>
+
+        <!-- fork -->
+        <path class="edge-open" d="M 592 162 L 632 162 L 632 68 L 704 68" marker-end="url(#a3)"></path>
+        <path class="edge-open" d="M 632 162 L 632 268 L 704 268" marker-end="url(#a3)"></path>
+        <text class="t-edge t-edge-open" x="596" y="122">approve</text>
+        <text class="t-edge t-edge-open" x="596" y="136">the shortlist</text>
+
+        <rect class="box" x="708" y="38" width="150" height="60" rx="7"></rect>
+        <text class="t-route" x="724" y="60">stage 4</text>
+        <text class="t-name" x="724" y="80">Deep dive</text>
+
+        <rect class="box" x="708" y="238" width="150" height="60" rx="7"></rect>
+        <text class="t-route" x="724" y="260">stage 5</text>
+        <text class="t-name" x="724" y="280">Annual plan</text>
+
+        <!-- reversals -->
+        <path class="edge-back" d="M 293 192 L 293 218 L 510 218 L 510 192" marker-end="url(#a3b)"></path>
+        <text class="t-edge t-edge-stop" x="330" y="234">reopen — warns if scoring is under way</text>
+
+        <path class="edge-back" d="M 783 98 L 783 118 L 660 118 L 660 330 L 510 330 L 510 200" marker-end="url(#a3b)"></path>
+        <text class="t-edge t-edge-stop" x="524" y="346">reopen the shortlist — discards every deep-dive task</text>
+
+        <text class="t-small" x="16" y="316">Locked stages hold nothing.</text>
+        <text class="t-small" x="16" y="333">They show why, not a blank table.</text>
+      </svg>
+    </div>
+    <figcaption>
+      <b>Figure 3 · Two gates, one of them costly.</b>
+      Confirming the direction is cheap to undo. Approving the shortlist is not: it freezes the
+      ranking, creates a task per surviving initiative, and reopening it throws those tasks away.
+      That is why the confirmation names what is about to happen, including how many people have
+      not scored yet.
+    </figcaption>
+  </figure>
+
+  <ul class="legend">
+    <li><span class="swatch sw-open"></span> Unlocks the next stage</li>
+    <li><span class="swatch sw-back"></span> Reversal, with consequences</li>
+  </ul>
+
+  <h3>The gate conditions, exactly</h3>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th>Stage</th><th>Opens when</th><th>Counts as done when</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2 · direction</td>
+          <td>Always</td>
+          <td><code>directionConfirmedAt</code> is set</td>
+        </tr>
+        <tr>
+          <td>3 · long list</td>
+          <td>Stage 2 confirmed</td>
+          <td><code>shortlistApprovedAt</code> is set</td>
+        </tr>
+        <tr>
+          <td>4 · deep dive</td>
+          <td>Shortlist approved</td>
+          <td>Every assigned plan submitted</td>
+        </tr>
+        <tr>
+          <td>5 · annual plan</td>
+          <td>Shortlist approved</td>
+          <td><code>planCompletedAt</code> is set</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2><span class="num">04</span>The decisions inside stage 3</h2>
+
+  <p>
+    Stage 3 carries the method's only arithmetic, and three decisions that change the answer.
+    Each respondent scores every initiative on three criteria at one to five — <span
+    style="font-family:var(--mono);font-size:.86em">Low 1 · Moderate 3 · High 5</span> — so one
+    person contributes at most fifteen points to an initiative.
+  </p>
+
+  <figure>
+    <div class="frame">
+      <svg viewBox="0 0 960 330" role="img"
+           aria-label="Stage three decision flow: writing at least two initiatives enables invitations, the first invitation locks the list version, submitted responses produce a ranking by mean, and approving the shortlist warns when respondents are outstanding.">
+        <defs>
+          <marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--muted)"></path>
+          </marker>
+        </defs>
+
+        <rect class="box" x="16" y="126" width="156" height="56" rx="7"></rect>
+        <text class="t-name" x="32" y="150">Build the list</text>
+        <text class="t-route" x="32" y="167">10–15 initiatives</text>
+
+        <path class="edge-firm" d="M 172 154 L 210 154" marker-end="url(#a4)"></path>
+        <polygon class="box" points="214,154 300,124 386,154 300,184"></polygon>
+        <text class="t-name" x="300" y="158" text-anchor="middle">Two or more?</text>
+
+        <path class="edge-firm" d="M 300 184 L 300 232 L 200 232" marker-end="url(#a4)"></path>
+        <text class="t-edge t-edge-stop" x="308" y="212">no</text>
+        <text class="t-small" x="40" y="236">Invitation stays disabled</text>
+
+        <path class="edge-firm" d="M 386 154 L 424 154" marker-end="url(#a4)"></path>
+        <text class="t-edge t-edge-open" x="390" y="146">yes</text>
+
+        <rect class="box-key" x="428" y="126" width="170" height="56" rx="7"></rect>
+        <text class="t-name" x="444" y="150">Invite to score</text>
+        <text class="t-route" x="444" y="167">the version locks here</text>
+
+        <path class="edge-firm" d="M 513 182 L 513 226" marker-end="url(#a4)"></path>
+        <text class="t-small" x="524" y="212">Everyone scores the same list</text>
+
+        <rect class="box" x="428" y="230" width="170" height="52" rx="7"></rect>
+        <text class="t-name" x="444" y="252">Responses arrive</text>
+        <text class="t-route" x="444" y="269">remind · revoke · reopen</text>
+
+        <path class="edge-firm" d="M 598 154 L 650 154" marker-end="url(#a4)"></path>
+
+        <rect class="box" x="654" y="112" width="180" height="84" rx="7"></rect>
+        <text class="t-name" x="670" y="136">Rank by the mean</text>
+        <text class="t-route" x="670" y="154">sum shown alongside</text>
+        <text class="t-route" x="670" y="170">ties share a rank</text>
+        <text class="t-route" x="670" y="186">cut line, default 6</text>
+
+        <path class="edge-firm" d="M 744 196 L 744 236" marker-end="url(#a4)"></path>
+        <polygon class="box" points="854,262 744,232 634,262 744,292"></polygon>
+        <text class="t-name" x="744" y="266" text-anchor="middle">Everyone in?</text>
+
+        <text class="t-edge t-edge-stop" x="428" y="314">no — approving is still allowed, and names who is missing</text>
+
+        <text class="t-small" x="16" y="42">Ranking on the mean, not the sum: an initiative should not lose because someone stayed silent.</text>
+        <text class="t-small" x="16" y="60">Both numbers are shown, so the figure still reconciles with the scoring matrix in the deck.</text>
+      </svg>
+    </div>
+    <figcaption>
+      <b>Figure 4 · Where the arithmetic can go wrong, and what the system does about it.</b>
+      The list locks the moment the first invitation leaves, so nobody scores a different version of
+      the question. The ranking is a mean rather than a sum, because the product deliberately lets
+      an admin look at results while responses are still outstanding — and a sum would quietly
+      punish an initiative for a respondent's silence.
+    </figcaption>
+  </figure>
+
+  <h2><span class="num">05</span>What the system refuses</h2>
+
+  <p>
+    A map is as much about the roads that are not there. These are enforced on the server, not by
+    hiding a button:
+  </p>
+
+  <div class="tw">
+    <table>
+      <thead>
+        <tr><th>Attempt</th><th>Result</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Another tenant's project</td>
+          <td>Not found — identical to a project id that was never real</td>
+        </tr>
+        <tr>
+          <td>A contributor reaching the project</td>
+          <td>No route exists; the token resolves to one task and stops</td>
+        </tr>
+        <tr>
+          <td>Scoring an item off your own list version</td>
+          <td>Rejected — the item must belong to the version you were invited to</td>
+        </tr>
+        <tr>
+          <td>Submitting a partial response</td>
+          <td>Blocked, with the count of what is still blank</td>
+        </tr>
+        <tr>
+          <td>Editing the list after invitations</td>
+          <td>Locked; a change means a new version, never a silent edit</td>
+        </tr>
+        <tr>
+          <td>Deleting without typing the name</td>
+          <td>Rejected server-side, not merely a disabled button</td>
+        </tr>
+        <tr>
+          <td>Reminding the same person repeatedly</td>
+          <td>Rate-limited to once a day, and every send is logged</td>
+        </tr>
+        <tr>
+          <td>OZ staff reading client strategy</td>
+          <td>No path built — the back office holds metadata only</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    BDMF — a method and a tool from OZ Global B2B. Drawn from the running system,
+    <span style="font-family:var(--mono)">OZGLOBALB2B/bdmf</span>.
+  </footer>
+
+</div>
