@@ -18,10 +18,7 @@ import type { StageKey, StageState } from "@/components/chrome";
 type Project = typeof projects.$inferSelect;
 
 /** The rail's lock/unlock rules, in one place. */
-export function stageStates(
-  p: Project,
-  facts: { longListLocked: boolean; anyScoreSubmitted: boolean },
-): Record<Exclude<StageKey, "overview">, StageState> {
+export function stageStates(p: Project): Record<Exclude<StageKey, "overview">, StageState> {
   const directionDone = Boolean(p.directionConfirmedAt);
   const shortlistDone = Boolean(p.shortlistApprovedAt);
   return {
@@ -228,9 +225,6 @@ export async function projectFacts(p: Project) {
     deepDiveSubmitted: deepDive.filter((d) => d.status === "submitted").length,
     shortlist,
     direction,
-    states: stageStates(p, {
-      longListLocked: Boolean(version.lockedAt),
-      anyScoreSubmitted: submitted > 0,
-    }),
+    states: stageStates(p),
   };
 }

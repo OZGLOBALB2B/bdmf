@@ -37,7 +37,7 @@
 
   --r: 7px;
   --rail: 250px;
-  --sans: "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: var(--font-rubik), "Rubik", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
 * { box-sizing: border-box; }

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { projects, assignments } from "@/db/schema";
 import { requireAdmin } from "@/lib/tenancy";
