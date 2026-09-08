@@ -45,6 +45,47 @@ recorded in `mail_log` — all invitation and reminder flows stay testable witho
 sending anything. With `ANTHROPIC_API_KEY` unset, Stage 4 summaries fall back to
 a deterministic summariser rather than failing.
 
+## Deploying
+
+GitHub Pages cannot host this app — it serves static files, and BDMF needs a
+server for sign-in, tenant isolation, invitation tokens, email and AI
+summaries. Vercel is the intended target; the repo can stay private.
+
+1. **Database.** Create a Postgres on [Neon](https://neon.tech) (free tier is
+   enough to start). Copy the **pooled** connection string — on Neon the host
+   contains `-pooler`. The app opens one connection per serverless invocation,
+   which needs a pooled endpoint.
+2. **Project.** On [Vercel](https://vercel.com), *Add New → Project*, and import
+   `OZGLOBALB2B/bdmf`. Framework and build command are detected automatically.
+3. **Environment variables.** Set these on the Vercel project:
+
+   | Variable | Value |
+   |---|---|
+   | `DATABASE_URL` | the pooled Neon string |
+   | `APP_URL` | the deployed URL, e.g. `https://bdmf.vercel.app` — invitation links are built from it |
+   | `RESEND_API_KEY` | optional; without it email logs to the console |
+   | `MAIL_FROM` | e.g. `BDMF <invites@yourdomain.com>` |
+   | `ANTHROPIC_API_KEY` | optional; without it summaries use the built-in summariser |
+   | `ANTHROPIC_MODEL` | `claude-opus-5` |
+
+4. **Create the schema.** Once, from your machine, against the new database:
+
+   ```bash
+   DATABASE_URL="postgresql://…pooled string…" npm run db:migrate
+   ```
+
+   This is deliberately not wired into the build: a deploy should never silently
+   alter a production schema.
+5. **First account.** Register through the deployed site, then grant yourself
+   the OZ back office:
+
+   ```bash
+   DATABASE_URL="postgresql://…" npm run oz:grant -- you@ozglobalb2b.com
+   ```
+
+Do **not** run `npm run seed` against production — it deletes and recreates the
+demo workspace.
+
 ## Layout
 
 ```

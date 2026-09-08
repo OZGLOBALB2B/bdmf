@@ -10,7 +10,8 @@
     "seed": "tsx --env-file=.env.local scripts/seed.ts",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "oz:grant": "tsx --env-file=.env.local scripts/make-platform-admin.ts"
+    "oz:grant": "tsx --env-file=.env.local scripts/make-platform-admin.ts",
+    "db:migrate": "tsx scripts/migrate.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
