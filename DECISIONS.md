@@ -63,7 +63,19 @@ link (the original token is only stored hashed and cannot be read back).
 
 **Invitations expire in 30 days** (scoring) and **45 days** (questionnaires).
 
-**Deleting a project is not implemented.** Archive only, per the PRS.
+**Project deletion is permanent and irreversible**, added at OZ's request. The
+PRS said archive-only with deletion TBD; the counter-argument was that being
+able to start a project without being able to remove one is a one-way door.
+
+Guards: the admin must type the project's exact name, checked again on the
+server; the dialog names what will be destroyed before they confirm; and the
+deletion is written to the audit log *before* the delete runs, with a null
+project reference, because `audit_events` cascades on project deletion and a
+row pointing at the project would be erased by the very action it records.
+
+What it does not do: contributors whose submitted work is destroyed are not
+notified, and there is no recovery window. If either matters to a client, a
+soft-delete with a 30-day restore window is the usual answer.
 
 **OZ staff cannot read client content.** The `/oz` back office shows metadata and
 operational status. A support-access path into client strategy content would need

@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { eq, desc } from "drizzle-orm";
 import { db } from "@/db";
 import { projects, assignments } from "@/db/schema";
 import { requireAdmin } from "@/lib/tenancy";
 import { Topbar, PageHead } from "@/components/chrome";
 import { NewProjectButton } from "./new-project";
+import { ProjectCard, type ProjectSummary } from "./project-card";
 
 export const dynamic = "force-dynamic";
 
@@ -21,7 +21,7 @@ export default async function WorkspaceHome() {
   const archived = rows.filter((p) => p.status === "archived");
 
   const outstanding = await Promise.all(
-    active.map(async (p) => {
+    rows.map(async (p) => {
       const all = await db
         .select({ status: assignments.status })
         .from(assignments)
@@ -41,6 +41,19 @@ export default async function WorkspaceHome() {
     if (p.shortlistApprovedAt) return { text: "Deep dive under way", cls: "on" };
     if (p.directionConfirmedAt) return { text: "Long list and scoring", cls: "on" };
     return { text: "Business direction", cls: "" };
+  };
+
+  const summarise = (p: (typeof rows)[number]): ProjectSummary => {
+    const c = counts.get(p.id);
+    return {
+      id: p.id,
+      name: p.name,
+      planYear: p.planYear,
+      archived: p.status === "archived",
+      stage: stageLabel(p),
+      sent: c?.sent ?? 0,
+      in: c?.in ?? 0,
+    };
   };
 
   return (
@@ -70,22 +83,9 @@ export default async function WorkspaceHome() {
             </div>
           ) : (
             <div className="grid2">
-              {active.map((p) => {
-                const s = stageLabel(p);
-                const c = counts.get(p.id);
-                return (
-                  <Link key={p.id} href={`/p/${p.id}`} className="card pad" style={{ display: "block", textDecoration: "none" }}>
-                    <div className="name" style={{ fontSize: 15 }}>{p.name}</div>
-                    <div className="desc">Plan year {p.planYear}</div>
-                    <div style={{ marginTop: 14 }} className={`tag ${s.cls}`}>{s.text}</div>
-                    {c && c.sent > 0 && (
-                      <div className="lab" style={{ marginTop: 10 }}>
-                        {c.sent} {c.sent === 1 ? "task" : "tasks"} sent · {c.in} back
-                      </div>
-                    )}
-                  </Link>
-                );
-              })}
+              {active.map((p) => (
+                <ProjectCard key={p.id} project={summarise(p)} />
+              ))}
             </div>
           )}
 
@@ -94,11 +94,7 @@ export default async function WorkspaceHome() {
               <h2 className="lab" style={{ margin: "30px 0 10px" }}>Archived</h2>
               <div className="grid2">
                 {archived.map((p) => (
-                  <Link key={p.id} href={`/p/${p.id}`} className="card pad" style={{ display: "block", textDecoration: "none", opacity: 0.62 }}>
-                    <div className="name" style={{ fontSize: 15 }}>{p.name}</div>
-                    <div className="desc">Plan year {p.planYear}</div>
-                    <div style={{ marginTop: 14 }} className="tag">Archived</div>
-                  </Link>
+                  <ProjectCard key={p.id} project={summarise(p)} />
                 ))}
               </div>
             </>
