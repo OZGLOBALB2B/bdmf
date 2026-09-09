@@ -1,0 +1,353 @@
+<title>BDMF Decisions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ground: #F7F6F9;
+    --surface: #FFFFFF;
+    --ink: #1A0B3D;
+    --body: #33294F;
+    --muted: #6E6688;
+    --faint: #A29BB8;
+    --rule: #DCD7E7;
+    --hair: #EBE8F2;
+    --accent: #3A1E8C;
+    --open: #4E7F14;
+    --open-soft: #EEF6E2;
+    --outside: #8F5A0E;
+    --outside-soft: #FBF2E2;
+    --stop: #9B1C33;
+
+    --sans: "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #100A24;
+      --surface: #191231;
+      --ink: #EFECF8;
+      --body: #C9C3DE;
+      --muted: #9A93B4;
+      --faint: #6B6489;
+      --rule: #322A50;
+      --hair: #251D40;
+      --accent: #A896F0;
+      --open: #9BD14A;
+      --open-soft: #1E2A12;
+      --outside: #E0A845;
+      --outside-soft: #2C2110;
+      --stop: #F08098;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #100A24;
+    --surface: #191231;
+    --ink: #EFECF8;
+    --body: #C9C3DE;
+    --muted: #9A93B4;
+    --faint: #6B6489;
+    --rule: #322A50;
+    --hair: #251D40;
+    --accent: #A896F0;
+    --open: #9BD14A;
+    --open-soft: #1E2A12;
+    --outside: #E0A845;
+    --outside-soft: #2C2110;
+    --stop: #F08098;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--ground);
+    color: var(--body);
+    font-family: var(--serif);
+    font-size: 17px;
+    line-height: 1.62;
+    margin: 0;
+    padding: 0 20px 96px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    display: grid;
+    grid-template-columns:
+      [full-start] minmax(0, 1fr)
+      [main-start] min(66ch, 100%) [main-end]
+      minmax(0, 1fr) [full-end];
+  }
+  .page > * { grid-column: main; }
+  .page > figure { grid-column: full; justify-self: center; width: min(1080px, 100%); }
+
+  header { padding: 72px 0 0; }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+  h1 {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: clamp(34px, 5.5vw, 52px);
+    line-height: 1.02;
+    letter-spacing: -.025em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin: 0 0 18px;
+  }
+  .standfirst {
+    font-size: 19px;
+    color: var(--muted);
+    margin: 0 0 34px;
+    text-wrap: pretty;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 25px;
+    letter-spacing: -.015em;
+    color: var(--ink);
+    text-wrap: balance;
+    margin: 64px 0 8px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+  }
+  h2 .num {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--faint);
+    letter-spacing: 0;
+    margin-right: 12px;
+    vertical-align: 3px;
+  }
+  h3 {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--ink);
+    margin: 36px 0 6px;
+  }
+  p { margin: 0 0 16px; text-wrap: pretty; }
+  strong { font-weight: 600; color: var(--ink); }
+  code {
+    font-family: var(--mono);
+    font-size: .86em;
+    color: var(--accent);
+    background: var(--hair);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  figure {
+    margin: 34px 0 10px;
+    padding: 0;
+  }
+  .frame {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 26px 22px;
+    overflow-x: auto;
+  }
+  figure svg { display: block; width: 100%; min-width: 720px; height: auto; }
+  figcaption {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-top: 14px;
+    padding-left: 2px;
+    max-width: 78ch;
+    text-wrap: pretty;
+  }
+  figcaption b { font-family: var(--sans); font-weight: 600; color: var(--ink); font-size: 13px; }
+
+  /* ---- shared SVG vocabulary ---- */
+  .box { fill: var(--surface); stroke: var(--rule); stroke-width: 1.25; }
+  .box-key { fill: var(--surface); stroke: var(--ink); stroke-width: 1.6; }
+  .box-open { fill: var(--open-soft); stroke: var(--open); stroke-width: 1.4; }
+  .box-out { fill: var(--outside-soft); stroke: var(--outside); stroke-width: 1.4; }
+  .zone { fill: none; stroke-width: 1.25; stroke-dasharray: 5 4; }
+  .zone-ws { stroke: var(--accent); }
+  .zone-out { stroke: var(--outside); }
+  .zone-oz { stroke: var(--muted); }
+
+  .t-name { font-family: var(--sans); font-size: 13px; font-weight: 600; fill: var(--ink); }
+  .t-route { font-family: var(--mono); font-size: 11px; fill: var(--muted); }
+  .t-zone {
+    font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em;
+    text-transform: uppercase; fill: var(--accent);
+  }
+  .t-zone-out { fill: var(--outside); }
+  .t-zone-oz { fill: var(--muted); }
+  .t-edge { font-family: var(--mono); font-size: 10.5px; fill: var(--muted); }
+  .t-edge-open { fill: var(--open); }
+  .t-edge-stop { fill: var(--stop); }
+  .t-small { font-family: var(--sans); font-size: 11px; fill: var(--muted); }
+
+  .edge { fill: none; stroke: var(--rule); stroke-width: 1.25; }
+  .edge-firm { fill: none; stroke: var(--muted); stroke-width: 1.4; }
+  .edge-open { fill: none; stroke: var(--open); stroke-width: 1.6; }
+  .edge-back { fill: none; stroke: var(--stop); stroke-width: 1.25; stroke-dasharray: 4 4; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px 22px;
+    font-family: var(--sans); font-size: 12.5px; color: var(--muted);
+    margin: 16px 0 0; padding: 0; list-style: none;
+  }
+  .legend li { display: flex; align-items: center; gap: 8px; }
+  .swatch { width: 22px; height: 0; border-top-width: 2px; border-top-style: solid; flex: none; }
+  .sw-open { border-color: var(--open); }
+  .sw-back { border-color: var(--stop); border-top-style: dashed; }
+  .sw-zone { border-color: var(--accent); border-top-style: dashed; }
+  .sw-out { border-color: var(--outside); border-top-style: dashed; }
+
+  table {
+    width: 100%; border-collapse: collapse; margin: 20px 0 8px;
+    font-family: var(--sans); font-size: 13.5px;
+  }
+  th {
+    text-align: left; font-weight: 600; color: var(--muted);
+    font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+    border-bottom: 1px solid var(--rule); padding: 0 14px 8px 0;
+  }
+  td { padding: 11px 14px 11px 0; border-bottom: 1px solid var(--hair); vertical-align: top; color: var(--body); }
+  td:first-child { font-family: var(--mono); font-size: 12px; color: var(--ink); white-space: nowrap; }
+  .tw { overflow-x: auto; }
+
+  .note {
+    border-left: 2px solid var(--accent);
+    padding: 2px 0 2px 18px;
+    margin: 24px 0;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  .note b { color: var(--ink); font-family: var(--sans); font-size: 14px; font-weight: 600; }
+
+  footer {
+    margin-top: 72px; padding-top: 22px; border-top: 1px solid var(--rule);
+    font-family: var(--sans); font-size: 12.5px; color: var(--faint);
+  }
+
+  /* ---------------------------------------------------------------
+     Print / PDF. The screen layout has two properties that break on
+     paper: the SVG min-width (720px) overflows A4 and clips every
+     diagram, and the dark palette would print as dark ink on white.
+     Both are overridden here rather than in a separate stylesheet, so
+     Cmd-P from the live page gives the same document as the PDF.
+     --------------------------------------------------------------- */
+  @page { size: A4; margin: 17mm 16mm 15mm; }
+
+  @media print {
+    :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+      --ground: #FFFFFF;
+      --surface: #FFFFFF;
+      --ink: #1A0B3D;
+      --body: #2B2246;
+      --muted: #554E6E;
+      --faint: #8A83A0;
+      --rule: #CFC9DE;
+      --hair: #E6E2EE;
+      --accent: #3A1E8C;
+      --open: #3E6B0E;
+      --open-soft: #F2F8E8;
+      --outside: #7A4C0B;
+      --outside-soft: #FCF5E8;
+      --stop: #8E1830;
+    }
+
+    body {
+      background: #fff;
+      font-size: 11pt;
+      line-height: 1.5;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page { display: block; }
+    .page > * { max-width: 134mm; margin-left: 0; margin-right: auto; }
+    .page > figure { max-width: 100%; width: 100%; }
+
+    /* the two that would otherwise clip */
+    figure svg { min-width: 0; }
+    .frame, .tw { overflow: visible; }
+
+    header { padding-top: 0; }
+    h1 { font-size: 30pt; margin-bottom: 14px; }
+    .standfirst { font-size: 12.5pt; margin-bottom: 26px; }
+    h2 { font-size: 15.5pt; margin-top: 30px; break-after: avoid; }
+    h3 { font-size: 12pt; break-after: avoid; }
+    p { orphans: 3; widows: 3; }
+
+    figure, figcaption, .note, .legend, footer, tr { break-inside: avoid; }
+    .frame { padding: 16px 12px; }
+    figcaption { font-size: 10pt; }
+    table { font-size: 9.5pt; }
+    td { padding: 8px 14px 8px 0; }   /* tightened so the colophon does not strand a page */
+    th { padding-bottom: 6px; }
+    .legend { font-size: 10pt; }
+    footer { margin-top: 20px; padding-top: 14px; }
+    a { text-decoration: none; color: inherit; }
+  }
+
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+  /* this document is prose only — no figures, so the measure carries it */
+  .decision { margin-bottom: 20px; }
+  .decision b {
+    font-family: var(--sans); font-weight: 600; font-size: 15.5px;
+    color: var(--ink); display: block; margin-bottom: 2px;
+  }
+  @media print {
+    .decision { break-inside: avoid; }
+    .decision b { font-size: 11.5pt; }
+  }
+</style>
+
+<div class="page">
+  <header>
+    <p class="eyebrow">OZ Global B2B · Business-Driven Marketing Focus</p>
+    <h1>Decisions taken, and where they came from</h1>
+    <p class="standfirst">
+      What was settled while building BDMF, what the sources disagreed about, and what is still
+      resting on an assumption OZ has not yet confirmed.
+    </p>
+  </header>
+
+    <p>Every decision below was needed to build something that runs. Items marked <strong>ASSUMPTION</strong> are ones OZ still needs to confirm; each says what would change if the answer is different.</p>
+    <h2><span class="num">01</span>Resolved from the source material</h2>
+    <p class="decision"><b>Scoring is three criteria, not one score.</b> The brief says &quot;a score from 1 to 5 for every item&quot;, which reads as one number per initiative. The scoring matrix on slides 8 and 23 of the Spectrum deck — a linked spreadsheet embedded as an image, so invisible to text search — has columns <em>Initiative | Business Impact | Strategic Differentiation | Feasibility &amp; Focus | Total Score | Owner</em>, with the legend <em>Low 1 · Moderate 3 · High 5</em>. So it is 1–5 <strong>per criterion</strong>: three scores per initiative, 15 points per respondent, 39 scores per person on a 13-item list. The criteria themselves are defined on slide 7.</p>
+    <p class="decision"><b>The &quot;ten-question questionnaire&quot; is the Scope &amp; Success Plan.</b> Slide 9 of the deck is a placeholder reading &quot;insert 10 questions&quot;. The Word form has eleven field groups; it becomes exactly ten questions here because the initiative title is inherited from the shortlist rather than retyped. See <code>src/lib/questionnaire.ts</code>.</p>
+    <p class="decision"><b>The calendar is slides 10/27.</b> Months across; a Goal band, the initiative rows, then KPIs, Special days and Special events. Only the names are filled in.</p>
+    <h2><span class="num">02</span>Decisions where the sources disagreed</h2>
+    <p class="decision"><b>Ranking uses the mean, not the sum.</b> The deck&#x27;s combined matrix sums across respondents; the written PRS proposes the arithmetic mean. They rank identically when everyone submits, and diverge as soon as someone does not — and this product deliberately lets an admin look at the ranking while responses are outstanding. Ranking on the sum would quietly punish an initiative for a respondent&#x27;s silence. The product ranks on the mean and <strong>shows the sum alongside</strong>, so the number reconciles with the deck. Ties share a rank rather than being broken arbitrarily.</p>
+    <p class="decision"><b>Stage numbering follows the brief, not the PRS.</b> The brief numbers stages 1–5; the PRS renumbers to &quot;Setup + Stages 1–4&quot; and then flags its own ambiguity. The product uses 1–5.</p>
+    <p class="decision"><b>Contributors get magic links, not accounts.</b> Stage 1 says everyone registers with email and password; Stages 3 and 4 describe Figma-style invitations to a single scoped page. A CEO with one ten-minute scoring task should not be creating a password. Contributors are passwordless rows reached by a single-purpose, expiring, hashed token that opens one page and nothing else. If they later sign in with an account, <code>/tasks</code> lists only their own assignments.</p>
+    <h2><span class="num">03</span>ASSUMPTIONS — confirm before this ships to a client</h2>
+    <p class="decision"><b>The ten questions.</b> Taken from the Word form. If a canonical list exists, bump <code>TEMPLATE_VERSION</code> and add it; responses record the version they answered, so old submissions stay readable.</p>
+    <p class="decision"><b>Full 1–5, not just 1/3/5.</b> The legend anchors Low/Moderate/High at 1/3/5, but the scale allows 2 and 4. Restricting to three values would change the distribution and the ranking.</p>
+    <p class="decision"><b>Email verification is not enforced.</b> Registration marks the account verified immediately. The PRS requires verification before access to client data. This is the largest known gap and should close before any real client data is entered.</p>
+    <p class="decision"><b>Reminder rate limit is one per person per day</b> , and reminders reissue the link (the original token is only stored hashed and cannot be read back).</p>
+    <p class="decision"><b>Invitations expire in 30 days</b> (scoring) and <strong>45 days</strong> (questionnaires).</p>
+    <p class="decision"><b>Project deletion is permanent and irreversible</b> , added at OZ&#x27;s request. The PRS said archive-only with deletion TBD; the counter-argument was that being able to start a project without being able to remove one is a one-way door.</p>
+    <p>Guards: the admin must type the project&#x27;s exact name, checked again on the server; the dialog names what will be destroyed before they confirm; and the deletion is written to the audit log <em>before</em> the delete runs, with a null project reference, because <code>audit_events</code> cascades on project deletion and a row pointing at the project would be erased by the very action it records.</p>
+    <p>What it does not do: contributors whose submitted work is destroyed are not notified, and there is no recovery window. If either matters to a client, a soft-delete with a 30-day restore window is the usual answer.</p>
+    <p class="decision"><b>OZ staff cannot read client content.</b> The <code>/oz</code> back office shows metadata and operational status. A support-access path into client strategy content would need an explicit, audited impersonation flow — deliberately not built.</p>
+    <h2><span class="num">04</span>Knowingly out of scope for this version</h2>
+    <p class="decision"><b>The deck&#x27;s &quot;Refine &amp; commit&quot; round.</b> The method has four steps: set direction, build the pool, deep-dive, then <em>management re-scores after reading the position papers and cuts 6 down to 4–5</em>. The brief&#x27;s Stage 5 jumps from deep dive to calendar. The product bridges this with a checkbox list on the annual plan — the admin unticks whatever that meeting dropped — but there is no second scoring round. If OZ wants one, it is a Stage 4.5 and reuses the whole scoring mechanism.</p>
+    <p class="decision"><b>Calendar export.</b> The grid renders on screen. PNG/PDF/PPTX is not built.</p>
+    <p class="decision"><b>Per-client branding.</b> One generic BDMF interface, OZ colours throughout.</p>
+
+  <footer>
+    BDMF — a method and a tool from OZ Global B2B. Kept current in
+    <span style="font-family:var(--mono)">OZGLOBALB2B/bdmf</span> as DECISIONS.md.
+  </footer>
+</div>

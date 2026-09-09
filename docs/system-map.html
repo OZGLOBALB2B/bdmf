@@ -235,6 +235,69 @@
     margin-top: 72px; padding-top: 22px; border-top: 1px solid var(--rule);
     font-family: var(--sans); font-size: 12.5px; color: var(--faint);
   }
+
+  /* ---------------------------------------------------------------
+     Print / PDF. The screen layout has two properties that break on
+     paper: the SVG min-width (720px) overflows A4 and clips every
+     diagram, and the dark palette would print as dark ink on white.
+     Both are overridden here rather than in a separate stylesheet, so
+     Cmd-P from the live page gives the same document as the PDF.
+     --------------------------------------------------------------- */
+  @page { size: A4; margin: 17mm 16mm 15mm; }
+
+  @media print {
+    :root, :root[data-theme="dark"], :root:not([data-theme="light"]) {
+      --ground: #FFFFFF;
+      --surface: #FFFFFF;
+      --ink: #1A0B3D;
+      --body: #2B2246;
+      --muted: #554E6E;
+      --faint: #8A83A0;
+      --rule: #CFC9DE;
+      --hair: #E6E2EE;
+      --accent: #3A1E8C;
+      --open: #3E6B0E;
+      --open-soft: #F2F8E8;
+      --outside: #7A4C0B;
+      --outside-soft: #FCF5E8;
+      --stop: #8E1830;
+    }
+
+    body {
+      background: #fff;
+      font-size: 11pt;
+      line-height: 1.5;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .page { display: block; }
+    .page > * { max-width: 134mm; margin-left: 0; margin-right: auto; }
+    .page > figure { max-width: 100%; width: 100%; }
+
+    /* the two that would otherwise clip */
+    figure svg { min-width: 0; }
+    .frame, .tw { overflow: visible; }
+
+    header { padding-top: 0; }
+    h1 { font-size: 30pt; margin-bottom: 14px; }
+    .standfirst { font-size: 12.5pt; margin-bottom: 26px; }
+    h2 { font-size: 15.5pt; margin-top: 30px; break-after: avoid; }
+    h3 { font-size: 12pt; break-after: avoid; }
+    p { orphans: 3; widows: 3; }
+
+    figure, figcaption, .note, .legend, footer, tr { break-inside: avoid; }
+    .frame { padding: 16px 12px; }
+    figcaption { font-size: 10pt; }
+    table { font-size: 9.5pt; }
+    td { padding: 8px 14px 8px 0; }   /* tightened so the colophon does not strand a page */
+    th { padding-bottom: 6px; }
+    .legend { font-size: 10pt; }
+    footer { margin-top: 20px; padding-top: 14px; }
+    a { text-decoration: none; color: inherit; }
+  }
+
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 
@@ -412,7 +475,7 @@
         <!-- D2 no -> sign in -->
         <path class="edge-firm" d="M 488 100 L 488 46 L 776 46" marker-end="url(#a2)"></path>
         <text class="t-edge" x="498" y="66">no</text>
-        <rect class="box" x="780" y="24" width="184" height="44" rx="7"></rect>
+        <rect class="box" x="780" y="24" width="204" height="44" rx="7"></rect>
         <text class="t-name" x="796" y="43">Sign in</text>
         <text class="t-route" x="796" y="59">/login · /register</text>
 
@@ -425,14 +488,14 @@
         <!-- D4 no -> error -->
         <path class="edge-firm" d="M 700 158 L 700 186 L 776 186" marker-end="url(#a2)"></path>
         <text class="t-edge t-edge-stop" x="708" y="180">no</text>
-        <rect class="box" x="780" y="164" width="184" height="44" rx="7"></rect>
+        <rect class="box" x="780" y="164" width="204" height="44" rx="7"></rect>
         <text class="t-name" x="796" y="183">That link does not work</text>
         <text class="t-route" x="796" y="199">unknown · expired · revoked</text>
 
         <!-- D4 yes -> the task -->
         <path class="edge-open" d="M 700 102 L 700 96 L 776 96" marker-end="url(#a2)"></path>
         <text class="t-edge t-edge-open" x="708" y="90">yes</text>
-        <rect class="box-out" x="780" y="74" width="184" height="44" rx="7"></rect>
+        <rect class="box-out" x="780" y="74" width="204" height="44" rx="7"></rect>
         <text class="t-name" x="796" y="93">Exactly one task</text>
         <text class="t-route" x="796" y="109">score · or write a plan</text>
 
@@ -443,14 +506,14 @@
         <!-- D3 no -> tasks -->
         <path class="edge-firm" d="M 500 326 L 500 272 L 776 272" marker-end="url(#a2)"></path>
         <text class="t-edge" x="510" y="292">no</text>
-        <rect class="box-out" x="780" y="250" width="184" height="44" rx="7"></rect>
+        <rect class="box-out" x="780" y="250" width="204" height="44" rx="7"></rect>
         <text class="t-name" x="796" y="269">My own tasks only</text>
         <text class="t-route" x="796" y="285">/tasks</text>
 
         <!-- D3 yes -> dashboard -->
         <path class="edge-open" d="M 600 358 L 776 358" marker-end="url(#a2)"></path>
         <text class="t-edge t-edge-open" x="608" y="350">yes</text>
-        <rect class="box-open" x="780" y="336" width="184" height="44" rx="7"></rect>
+        <rect class="box-open" x="780" y="336" width="204" height="44" rx="7"></rect>
         <text class="t-name" x="796" y="355">That workspace only</text>
         <text class="t-route" x="796" y="371">/  → /p/[id] → stages</text>
 
@@ -462,7 +525,7 @@
 
         <path class="edge-firm" d="M 300 476 L 300 502 L 776 502" marker-end="url(#a2)"></path>
         <text class="t-edge t-edge-open" x="310" y="496">yes</text>
-        <rect class="box" x="780" y="480" width="184" height="44" rx="7"></rect>
+        <rect class="box" x="780" y="480" width="204" height="44" rx="7"></rect>
         <text class="t-name" x="796" y="499">The back office</text>
         <text class="t-route" x="796" y="515">/oz</text>
       </svg>
@@ -492,8 +555,8 @@
 
   <figure>
     <div class="frame">
-      <svg viewBox="0 0 960 360" role="img"
-           aria-label="Stage gate diagram: access leads to business direction, which unlocks the long list once confirmed. Approving the shortlist unlocks both the deep dive and the annual plan. Reopening the shortlist discards every deep dive task.">
+      <svg viewBox="0 0 980 400" role="img"
+           aria-label="Stage gate diagram: access leads to business direction, which unlocks the long list once confirmed. Approving the shortlist unlocks both the deep dive and the annual plan. Reopening the direction warns if scoring is under way; reopening the shortlist discards every deep dive task.">
         <defs>
           <marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
             <path d="M 0 1 L 9 5 L 0 9 z" fill="var(--open)"></path>
@@ -503,46 +566,47 @@
           </marker>
         </defs>
 
-        <rect class="box" x="16" y="132" width="150" height="60" rx="7"></rect>
-        <text class="t-route" x="32" y="154">stage 1</text>
-        <text class="t-name" x="32" y="174">Access &amp; people</text>
+        <rect class="box" x="16" y="150" width="140" height="58" rx="7"></rect>
+        <text class="t-route" x="32" y="172">stage 1</text>
+        <text class="t-name" x="32" y="192">Access &amp; people</text>
 
-        <path class="edge-open" d="M 166 162 L 214 162" marker-end="url(#a3)"></path>
+        <path class="edge-open" d="M 156 179 L 212 179" marker-end="url(#a3)"></path>
 
-        <rect class="box" x="218" y="132" width="150" height="60" rx="7"></rect>
-        <text class="t-route" x="234" y="154">stage 2</text>
-        <text class="t-name" x="234" y="174">Direction</text>
+        <rect class="box" x="216" y="150" width="140" height="58" rx="7"></rect>
+        <text class="t-route" x="232" y="172">stage 2</text>
+        <text class="t-name" x="232" y="192">Direction</text>
 
-        <path class="edge-open" d="M 368 162 L 424 162" marker-end="url(#a3)"></path>
-        <text class="t-edge t-edge-open" x="360" y="146">confirm stage 2</text>
+        <text class="t-edge t-edge-open" x="399" y="128" text-anchor="middle">confirm</text>
+        <text class="t-edge t-edge-open" x="399" y="141" text-anchor="middle">stage 2</text>
+        <path class="edge-open" d="M 356 179 L 442 179" marker-end="url(#a3)"></path>
 
-        <rect class="box" x="428" y="132" width="164" height="60" rx="7"></rect>
-        <text class="t-route" x="444" y="154">stage 3</text>
-        <text class="t-name" x="444" y="174">Long list &amp; scoring</text>
+        <rect class="box" x="446" y="150" width="170" height="58" rx="7"></rect>
+        <text class="t-route" x="462" y="172">stage 3</text>
+        <text class="t-name" x="462" y="192">Long list &amp; scoring</text>
 
-        <!-- fork -->
-        <path class="edge-open" d="M 592 162 L 632 162 L 632 68 L 704 68" marker-end="url(#a3)"></path>
-        <path class="edge-open" d="M 632 162 L 632 268 L 704 268" marker-end="url(#a3)"></path>
-        <text class="t-edge t-edge-open" x="596" y="122">approve</text>
-        <text class="t-edge t-edge-open" x="596" y="136">the shortlist</text>
+        <path class="edge-open" d="M 616 179 L 660 179"></path>
+        <path class="edge-open" d="M 660 89 L 660 279"></path>
+        <path class="edge-open" d="M 660 89 L 756 89" marker-end="url(#a3)"></path>
+        <path class="edge-open" d="M 660 279 L 756 279" marker-end="url(#a3)"></path>
+        <text class="t-edge t-edge-open" x="668" y="174">approve the</text>
+        <text class="t-edge t-edge-open" x="668" y="188">shortlist</text>
 
-        <rect class="box" x="708" y="38" width="150" height="60" rx="7"></rect>
-        <text class="t-route" x="724" y="60">stage 4</text>
-        <text class="t-name" x="724" y="80">Deep dive</text>
+        <rect class="box" x="760" y="60" width="150" height="58" rx="7"></rect>
+        <text class="t-route" x="776" y="82">stage 4</text>
+        <text class="t-name" x="776" y="102">Deep dive</text>
 
-        <rect class="box" x="708" y="238" width="150" height="60" rx="7"></rect>
-        <text class="t-route" x="724" y="260">stage 5</text>
-        <text class="t-name" x="724" y="280">Annual plan</text>
+        <rect class="box" x="760" y="250" width="150" height="58" rx="7"></rect>
+        <text class="t-route" x="776" y="272">stage 5</text>
+        <text class="t-name" x="776" y="292">Annual plan</text>
 
-        <!-- reversals -->
-        <path class="edge-back" d="M 293 192 L 293 218 L 510 218 L 510 192" marker-end="url(#a3b)"></path>
-        <text class="t-edge t-edge-stop" x="330" y="234">reopen — warns if scoring is under way</text>
+        <path class="edge-back" d="M 480 208 L 480 240 L 286 240 L 286 214" marker-end="url(#a3b)"></path>
+        <text class="t-edge t-edge-stop" x="286" y="258">reopen — warns if scoring is under way</text>
 
-        <path class="edge-back" d="M 783 98 L 783 118 L 660 118 L 660 330 L 510 330 L 510 200" marker-end="url(#a3b)"></path>
-        <text class="t-edge t-edge-stop" x="524" y="346">reopen the shortlist — discards every deep-dive task</text>
+        <path class="edge-back" d="M 910 89 L 940 89 L 940 348 L 560 348 L 560 216" marker-end="url(#a3b)"></path>
+        <text class="t-edge t-edge-stop" x="566" y="366">reopen the shortlist — discards every deep-dive task</text>
 
-        <text class="t-small" x="16" y="316">Locked stages hold nothing.</text>
-        <text class="t-small" x="16" y="333">They show why, not a blank table.</text>
+        <text class="t-small" x="16" y="330">Locked stages hold nothing.</text>
+        <text class="t-small" x="16" y="347">They show why, not a blank table.</text>
       </svg>
     </div>
     <figcaption>
@@ -625,18 +689,18 @@
         <path class="edge-firm" d="M 386 154 L 424 154" marker-end="url(#a4)"></path>
         <text class="t-edge t-edge-open" x="390" y="146">yes</text>
 
-        <rect class="box-key" x="428" y="126" width="170" height="56" rx="7"></rect>
+        <rect class="box-key" x="428" y="126" width="180" height="56" rx="7"></rect>
         <text class="t-name" x="444" y="150">Invite to score</text>
         <text class="t-route" x="444" y="167">the version locks here</text>
 
         <path class="edge-firm" d="M 513 182 L 513 226" marker-end="url(#a4)"></path>
-        <text class="t-small" x="524" y="212">Everyone scores the same list</text>
+        <text class="t-small" x="528" y="212">Everyone scores the same list</text>
 
-        <rect class="box" x="428" y="230" width="170" height="52" rx="7"></rect>
+        <rect class="box" x="428" y="230" width="180" height="52" rx="7"></rect>
         <text class="t-name" x="444" y="252">Responses arrive</text>
         <text class="t-route" x="444" y="269">remind · revoke · reopen</text>
 
-        <path class="edge-firm" d="M 598 154 L 650 154" marker-end="url(#a4)"></path>
+        <path class="edge-firm" d="M 608 154 L 650 154" marker-end="url(#a4)"></path>
 
         <rect class="box" x="654" y="112" width="180" height="84" rx="7"></rect>
         <text class="t-name" x="670" y="136">Rank by the mean</text>
