@@ -45,6 +45,20 @@ recorded in `mail_log` — all invitation and reminder flows stay testable witho
 sending anything. With `ANTHROPIC_API_KEY` unset, Stage 4 summaries fall back to
 a deterministic summariser rather than failing.
 
+## Published documentation
+
+The system map and decision log are published as a static site from a separate
+**public** repository, so this one stays private:
+
+- Site — https://ozglobalb2b.github.io/bdmf-docs/
+- Repo — https://github.com/OZGLOBALB2B/bdmf-docs
+
+The sources live here, in `docs/`. To republish after editing them, rebuild the
+standalone pages and push that repo — the published copies are wrapped with
+their own `<head>`, which the artifact and PDF versions do not need.
+
+GitHub Pages cannot host the application itself; see below.
+
 ## Deploying
 
 GitHub Pages cannot host this app — it serves static files, and BDMF needs a
