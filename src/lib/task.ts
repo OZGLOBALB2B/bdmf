@@ -1,12 +1,14 @@
 import "server-only";
-import { eq, and, gt } from "drizzle-orm";
+import { eq, and, gt, sql } from "drizzle-orm";
 import { db } from "@/db";
+import { alias } from "drizzle-orm/pg-core";
 import {
   assignments,
   users,
   projects,
   longListItems,
   shortlistItems,
+  directionItems,
   questionnaireResponses,
 } from "@/db/schema";
 import { hashToken } from "./auth";
@@ -34,7 +36,17 @@ export type ResolvedTask =
       assignment: typeof assignments.$inferSelect;
       person: { name: string | null; email: string };
       project: { id: string; name: string };
-      initiative: { id: string; title: string; description: string };
+      initiative: {
+        id: string;
+        title: string;
+        description: string;
+        /** Where this sat in the consolidated ranking, and out of how many. */
+        rank: number;
+        outOf: number;
+        sumTotal: number;
+        /** The Stage 2 objective the long-list row was linked to, if any. */
+        linkedObjective: string | null;
+      };
       response: typeof questionnaireResponses.$inferSelect | null;
     };
 
@@ -88,17 +100,40 @@ export async function resolveTask(token: string, viewerId?: string): Promise<Res
     };
   }
 
+  // The linked objective may itself be a sub-item (1.1, 1.2), so its parent is
+  // joined too — the wireframe shows the pair as "parent → child".
+  const objective = alias(directionItems, "objective");
+  const objectiveParent = alias(directionItems, "objective_parent");
+
   const [sl] = await db
     .select({
       id: shortlistItems.id,
       title: longListItems.title,
       description: longListItems.description,
+      rank: shortlistItems.rank,
+      sumTotal: shortlistItems.sumTotal,
+      versionId: longListItems.versionId,
+      objectiveTitle: objective.title,
+      parentTitle: objectiveParent.title,
     })
     .from(shortlistItems)
     .innerJoin(longListItems, eq(longListItems.id, shortlistItems.longListItemId))
+    .leftJoin(objective, eq(objective.id, longListItems.directionItemId))
+    .leftJoin(objectiveParent, eq(objectiveParent.id, objective.parentId))
     .where(eq(shortlistItems.id, row.a.shortlistItemId!));
 
   if (!sl) return { kind: "invalid", reason: "unknown" };
+
+  const [{ outOf }] = await db
+    .select({ outOf: sql<number>`count(*)` })
+    .from(longListItems)
+    .where(eq(longListItems.versionId, sl.versionId));
+
+  const linkedObjective = sl.objectiveTitle
+    ? sl.parentTitle
+      ? `${sl.parentTitle} → ${sl.objectiveTitle}`
+      : sl.objectiveTitle
+    : null;
 
   const [response] = await db
     .select()
@@ -111,7 +146,15 @@ export async function resolveTask(token: string, viewerId?: string): Promise<Res
     assignment: row.a,
     person,
     project,
-    initiative: sl,
+    initiative: {
+      id: sl.id,
+      title: sl.title,
+      description: sl.description,
+      rank: sl.rank,
+      outOf: Number(outOf),
+      sumTotal: sl.sumTotal,
+      linkedObjective,
+    },
     response: response ?? null,
   };
 }

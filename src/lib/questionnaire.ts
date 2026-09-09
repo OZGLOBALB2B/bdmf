@@ -1,16 +1,17 @@
 /**
- * Stage 4's "ten-question questionnaire".
+ * Stage 4's ten-question questionnaire.
  *
- * Slide 9 of the Spectrum deck is still a placeholder reading "insert 10
- * questions", so the authoritative source is the Word form "Marketing
- * initiative scope and success plan". Its eleven field groups become ten
- * questions here because the initiative title is inherited from the shortlist
- * rather than retyped, and strategic alignment is pre-filled from the Stage 2
- * objective the long-list row was linked to.
+ * The subjects and their order come from the Word form "Marketing initiative
+ * scope and success plan"; the labels and guidance are taken verbatim from the
+ * Figma wireframe (03 · Wireframes — Participant, frame P2 "Scope & Success
+ * Plan"), which confirmed the same ten in the same sequence.
  *
- * ASSUMPTION, flagged for OZ: if a canonical list of ten questions exists
- * elsewhere, bump TEMPLATE_VERSION and add it — responses store the version
- * they answered, so old submissions stay readable.
+ * Two places still differ from that wireframe deliberately, because the AI
+ * summary reads these fields rather than just displaying them: success metrics
+ * are three numbered inputs rather than one free-text box, so "up to three" is
+ * enforced; and risks are three rows of risk / likelihood / counter-measure, so
+ * the summary can say when a risk carries no counter-measure. Both are drawn as
+ * plain text areas in the wireframe.
  */
 
 export const TEMPLATE_VERSION = 1;
@@ -32,8 +33,8 @@ export const QUESTIONS: Question[] = [
     id: "description",
     n: 1,
     type: "long_text",
-    label: "What is this initiative?",
-    help: "A concise overview, and why it matters strategically.",
+    label: "Description",
+    help: "A concise overview of the initiative and why it is strategically important.",
     required: true,
     placeholder: "What it is, and why it is worth doing now…",
   },
@@ -41,15 +42,15 @@ export const QUESTIONS: Question[] = [
     id: "alignment",
     n: 2,
     type: "long_text",
-    label: "How does it advance the business?",
-    help: "The business objective this initiative is intended to move. Pre-filled from the business direction where the long list was linked to one.",
+    label: "Strategic alignment",
+    help: "Which business objective is this intended to advance? Pre-filled from the long list — change it if it is wrong.",
     required: true,
   },
   {
     id: "owner",
     n: 3,
     type: "short_text",
-    label: "Who is accountable?",
+    label: "Owner (accountable)",
     help: "One name. The person answerable for the outcome, not the person doing the work.",
     required: true,
   },
@@ -57,56 +58,56 @@ export const QUESTIONS: Question[] = [
     id: "team",
     n: 4,
     type: "long_text",
-    label: "Who else is involved?",
-    help: "The colleagues who will execute it with you, the advisors you can consult, and the internal or external contacts who hold information you will need.",
+    label: "Core team & stakeholders",
+    help: "Who executes with you, who advises, and which internal or external contacts hold information you will need.",
     required: true,
   },
   {
     id: "milestones",
     n: 5,
     type: "milestones",
-    label: "What are the milestones?",
-    help: "Four to six. Realistic dates, and a clear definition of done for each.",
+    label: "Key milestones & dates",
+    help: "Four to six milestones. Realistic dates, and a clear definition of done for each.",
     required: true,
   },
   {
     id: "golive",
     n: 6,
     type: "date",
-    label: "What is the go-live date?",
-    help: "A single, board-level date. Every milestone above should roll up to it.",
+    label: "Go-live date",
+    help: "A single board-level date. Every milestone above must roll up to it.",
     required: true,
   },
   {
     id: "metrics",
     n: 7,
     type: "metrics",
-    label: "How will you know it worked?",
-    help: "Up to three SMART indicators — specific, measurable, achievable, relevant, time-bound.",
+    label: "Success metrics",
+    help: "Up to three SMART indicators that will show whether this worked.",
     required: true,
   },
   {
     id: "resources",
     n: 8,
     type: "long_text",
-    label: "What will it take?",
-    help: "People and effort, budget and amount, and the managerial capacity required.",
+    label: "Required resources",
+    help: "People, budget and managerial capacity — with the cost or effort against each.",
     required: true,
   },
   {
     id: "risks",
     n: 9,
     type: "risks",
-    label: "What could go wrong?",
-    help: "The top three risks, each with a likelihood and a one-line counter-measure. For example — Risk: delays in regulatory approval. Counter-measure: early engagement with the FDA and parallel submission planning.",
+    label: "Top 3 risks & counter-measures",
+    help: "One line per risk, with its likelihood and the counter-measure. Example: delays in regulatory approval → early FDA engagement and parallel submission planning.",
     required: true,
   },
   {
     id: "extra",
     n: 10,
     type: "long_text",
-    label: "Anything else?",
-    help: "Factors, insights or support needs that would strengthen this initiative but were not captured above.",
+    label: "Anything else",
+    help: "Factors, insights or support needs that would strengthen this initiative and are not captured above.",
     required: false,
   },
 ];
@@ -169,7 +170,29 @@ export function missingAnswers(a: Answers): Question[] {
   });
 }
 
-/** 0..1, for the progress indicator on the contributor's form. */
+/**
+ * How many of the ten carry no answer at all — including question 10, which is
+ * optional and so never appears in missingAnswers(). The footer counts out of
+ * ten, so it has to count all ten or the figure contradicts the page.
+ */
+export function emptyCount(a: Answers): number {
+  return QUESTIONS.filter((q) => {
+    switch (q.type) {
+      case "milestones":
+        return filledMilestones(a.milestones).length === 0;
+      case "metrics":
+        return filledMetrics(a.metrics).length === 0;
+      case "risks":
+        return filledRisks(a.risks).length === 0;
+      default: {
+        const v = a[q.id as keyof Answers];
+        return typeof v !== "string" || !v.trim();
+      }
+    }
+  }).length;
+}
+
+/** 0..1, for any progress indicator. */
 export function completion(a: Answers): number {
   const answered = QUESTIONS.length - missingAnswers(a).length;
   return answered / QUESTIONS.length;

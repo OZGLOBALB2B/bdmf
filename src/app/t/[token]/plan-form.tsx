@@ -1,15 +1,25 @@
 "use client";
 
-import { useState, useTransition, useRef } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { saveAnswers, submitAnswers } from "@/app/actions/task";
 import {
   QUESTIONS,
-  completion,
+  missingAnswers,
+  emptyCount,
   emptyMilestone,
   type Answers,
   type Milestone,
   type Risk,
 } from "@/lib/questionnaire";
+
+function relativeTime(d: Date): string {
+  const mins = Math.floor((Date.now() - d.getTime()) / 60000);
+  if (mins < 1) return "just now";
+  if (mins === 1) return "1 minute ago";
+  if (mins < 60) return `${mins} minutes ago`;
+  const hrs = Math.round(mins / 60);
+  return hrs === 1 ? "1 hour ago" : `${hrs} hours ago`;
+}
 
 /** One numbered question, with its guidance and whatever control it needs. */
 function Q({ n, children }: { n: number; children: React.ReactNode }) {
@@ -33,16 +43,23 @@ function Q({ n, children }: { n: number; children: React.ReactNode }) {
 
 export function PlanForm({
   token,
-  projectName,
   initiative,
   initial,
   submitted,
   message,
   who,
+  savedAt,
 }: {
   token: string;
-  projectName: string;
-  initiative: { title: string; description: string };
+  initiative: {
+    title: string;
+    description: string;
+    rank: number;
+    outOf: number;
+    sumTotal: number;
+    linkedObjective: string | null;
+  };
+  savedAt: Date | null;
   initial: Answers;
   submitted: boolean;
   message: string | null;
@@ -53,8 +70,18 @@ export function PlanForm({
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState(submitted);
   const [saved, setSaved] = useState<"idle" | "saving" | "saved">("idle");
+  const [savedTime, setSavedTime] = useState<Date | null>(savedAt);
+  const [, setTick] = useState(0);
   const [pending, startTransition] = useTransition();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // one slow tick so "saved 2 minutes ago" does not sit frozen at "just now"
+  useEffect(() => {
+    const id = setInterval(() => setTick((t) => t + 1), 30_000);
+    return () => clearInterval(id);
+  }, []);
+
+  const lastSaved = savedTime ? relativeTime(savedTime) : null;
 
   // Plain function: the React Compiler memoizes this, and a manual useCallback
   // here only fights it.
@@ -64,6 +91,7 @@ export function PlanForm({
       setSaved("saving");
       await saveAnswers(token, next);
       setSaved("saved");
+      setSavedTime(new Date());
     }, 900);
   };
 
@@ -97,7 +125,8 @@ export function PlanForm({
     );
   }
 
-  const pct = Math.round(completion(a) * 100);
+  const left = emptyCount(a);
+  const blocking = missingAnswers(a).length;
 
   /**
    * Row editors merge from the previous state too — editing two cells of the
@@ -131,19 +160,23 @@ export function PlanForm({
     <>
       <h1 className="title">{initiative.title}</h1>
       <p className="sub">
-        This initiative made the shortlist for {projectName}. Ten questions on what it actually
-        takes to do it — scope, milestones, what success looks like, and what could go wrong.
-        {initiative.description && ` The list described it as: ${initiative.description}`}
+        You have been asked to build the scope and success plan for this initiative. Ten
+        questions. Save as you go — nothing is shared with the admin until you submit.
       </p>
 
       {message && (
         <div className="note" style={{ marginTop: 16, fontStyle: "italic" }}>&ldquo;{message}&rdquo;</div>
       )}
 
-      <div className="legend" style={{ margin: "20px 0 16px" }}>
-        <span>{pct}% complete</span>
-        <span className="spread" />
-        <span>{saved === "saving" ? "Saving…" : saved === "saved" ? "Draft saved" : "Saves as you type"}</span>
+      <div className="provenance">
+        <div className="lab">From the long list</div>
+        <p>
+          {initiative.description}
+          {initiative.linkedObjective && (
+            <> {" · "}Linked objective: {initiative.linkedObjective}.</>
+          )}
+          {" · "}Ranked {initiative.rank} of {initiative.outOf}, total score {initiative.sumTotal}.
+        </p>
       </div>
 
       <Q n={1}>
@@ -174,8 +207,8 @@ export function PlanForm({
                 <th style={{ width: 24 }} />
                 <th>Milestone</th>
                 <th style={{ width: 140 }}>Finish line</th>
-                <th style={{ width: 150 }}>Who leads it</th>
-                <th>Done when</th>
+                <th style={{ width: 150 }}>Milestone leader</th>
+                <th>Definition of done</th>
               </tr>
             </thead>
             <tbody>
@@ -210,7 +243,7 @@ export function PlanForm({
         {(a.milestones ?? []).length < 6 && (
           <button className="dash" style={{ marginTop: 8 }}
             onClick={() => patch({ milestones: [...(a.milestones ?? []), emptyMilestone()] })}>
-            Add a milestone
+            + Add milestone ({6 - (a.milestones ?? []).length} more allowed)
           </button>
         )}
       </Q>
@@ -273,12 +306,19 @@ export function PlanForm({
 
       <div className="card pad row" style={{ marginTop: 18 }}>
         <div>
-          <div className="name">{pct}% complete</div>
-          <div className="desc">Saved as you type. You can close this and come back to the same link.</div>
+          <div className="name">
+            {saved === "saving" ? "Saving…" : lastSaved ? `Draft saved ${lastSaved}` : "Saves as you type"}
+          </div>
+          <div className="desc">
+            {left === 0
+              ? "All ten answered. You can still change anything before you submit."
+              : `${left} of ${QUESTIONS.length} questions still empty.` +
+                (blocking === 0 ? " Only the optional one — you can submit." : "")}
+          </div>
         </div>
         <span className="spread" />
         <button className="btn" disabled={pending}
-          onClick={() => startTransition(async () => { setSaved("saving"); await saveAnswers(token, latest.current); setSaved("saved"); })}>
+          onClick={() => startTransition(async () => { setSaved("saving"); await saveAnswers(token, latest.current); setSaved("saved"); setSavedTime(new Date()); })}>
           Save draft
         </button>
         <button className="btn pri" disabled={pending}
@@ -289,7 +329,7 @@ export function PlanForm({
               else setDone(true);
             })
           }>
-          {pending ? "Sending…" : "Submit the plan"}
+          {pending ? "Sending…" : "Submit"}
         </button>
       </div>
 

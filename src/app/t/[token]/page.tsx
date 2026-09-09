@@ -76,6 +76,13 @@ export default async function TaskPage({ params }: { params: Promise<{ token: st
 
   const answers: Answers = { ...blankAnswers(), ...((row?.answers as Answers) ?? {}) };
 
+  // Q2 arrives pre-filled from the objective the long-list row was linked to,
+  // as the wireframe specifies. Only when the participant has not written
+  // their own answer — never overwrite what they typed.
+  if (!answers.alignment?.trim() && task.initiative.linkedObjective) {
+    answers.alignment = task.initiative.linkedObjective;
+  }
+
   return (
     <>
       <Topbar crumbs={[{ label: task.project.name }]} />
@@ -83,12 +90,12 @@ export default async function TaskPage({ params }: { params: Promise<{ token: st
         <div className="wrap-narrow">
           <PlanForm
             token={token}
-            projectName={task.project.name}
             initiative={task.initiative}
             initial={answers}
             submitted={submitted}
             message={task.assignment.message}
             who={who}
+            savedAt={row?.updatedAt ?? null}
           />
         </div>
       </main>

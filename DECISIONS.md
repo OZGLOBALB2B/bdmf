@@ -15,10 +15,23 @@ legend *Low 1 · Moderate 3 · High 5*. So it is 1–5 **per criterion**: three
 scores per initiative, 15 points per respondent, 39 scores per person on a
 13-item list. The criteria themselves are defined on slide 7.
 
-**The "ten-question questionnaire" is the Scope & Success Plan.** Slide 9 of the
-deck is a placeholder reading "insert 10 questions". The Word form has eleven
-field groups; it becomes exactly ten questions here because the initiative title
-is inherited from the shortlist rather than retyped. See `src/lib/questionnaire.ts`.
+**The ten questions — now confirmed.** Slide 9 of the deck is a placeholder
+reading "insert 10 questions", so the subjects and their order were derived from
+the Word form "Marketing initiative scope and success plan": eleven field groups
+become ten questions because the initiative title is inherited from the shortlist
+rather than retyped.
+
+The Figma wireframe (03 · Wireframes — Participant, frame P2) has since confirmed
+the same ten in the same sequence, and supplies the labels and guidance the
+product now uses verbatim. This is no longer an assumption. See
+`src/lib/questionnaire.ts`.
+
+Two details are deliberately not as the wireframe draws them, because the AI
+summary reads these fields rather than only displaying them: **success metrics**
+are three numbered inputs rather than one free-text box, so "up to three" is
+enforced; and **risks** are three rows of risk / likelihood / counter-measure, so
+the summary can report when a risk carries no counter-measure. The wireframe
+shows both as plain text areas. Say the word and they become text areas.
 
 **The calendar is slides 10/27.** Months across; a Goal band, the initiative
 rows, then KPIs, Special days and Special events. Only the names are filled in.
@@ -45,10 +58,6 @@ expiring, hashed token that opens one page and nothing else. If they later sign
 in with an account, `/tasks` lists only their own assignments.
 
 ## ASSUMPTIONS — confirm before this ships to a client
-
-**The ten questions.** Taken from the Word form. If a canonical list exists,
-bump `TEMPLATE_VERSION` and add it; responses record the version they answered,
-so old submissions stay readable.
 
 **Full 1–5, not just 1/3/5.** The legend anchors Low/Moderate/High at 1/3/5, but
 the scale allows 2 and 4. Restricting to three values would change the
