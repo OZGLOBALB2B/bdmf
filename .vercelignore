@@ -1,0 +1,6 @@
+out
+docs
+.pdfvenv
+drizzle/meta
+*.md
+!README.md

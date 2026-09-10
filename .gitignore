@@ -44,3 +44,4 @@ next-env.d.ts
 # generated PDFs — rebuild with scripts/build-docs-pdf.sh
 out/
 .pdfvenv/
+.neon

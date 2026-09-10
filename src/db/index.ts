@@ -3,7 +3,14 @@ import { Pool } from "pg";
 import * as schema from "./schema";
 
 /**
- * Postgres connection.
+ * Postgres connection, created lazily.
+ *
+ * Nothing happens at import time. That matters: `next build` evaluates every
+ * page module to collect its configuration, and a module that reads
+ * DATABASE_URL at import throws the whole build over an environment variable
+ * that is only needed at request time. Hosting providers set runtime variables
+ * separately from build ones, so the build would fail on a correctly
+ * configured deployment.
  *
  * In development this is one long-lived pool per process, stashed on
  * globalThis so Next's HMR does not leak a new pool on every reload.
@@ -13,10 +20,15 @@ import * as schema from "./schema";
  * load. Point DATABASE_URL at a POOLED endpoint (on Neon, the host containing
  * `-pooler`) and keep one connection per invocation.
  */
-const globalForDb = globalThis as unknown as { __bdmfPool?: Pool };
+const globalForDb = globalThis as unknown as {
+  __bdmfPool?: Pool;
+  __bdmfDb?: NodePgDatabase;
+};
 const isProd = process.env.NODE_ENV === "production";
 
-function createPool() {
+type NodePgDatabase = ReturnType<typeof drizzle<typeof schema>>;
+
+function createPool(): Pool {
   const connectionString = process.env.DATABASE_URL;
   if (!connectionString) {
     throw new Error(
@@ -38,8 +50,26 @@ function createPool() {
   });
 }
 
-const pool = globalForDb.__bdmfPool ?? createPool();
-if (!isProd) globalForDb.__bdmfPool = pool;
+function connection(): NodePgDatabase {
+  if (!globalForDb.__bdmfDb) {
+    const pool = globalForDb.__bdmfPool ?? createPool();
+    if (!isProd) globalForDb.__bdmfPool = pool;
+    const instance = drizzle(pool, { schema });
+    if (!isProd) globalForDb.__bdmfDb = instance;
+    return instance;
+  }
+  return globalForDb.__bdmfDb;
+}
 
-export const db = drizzle(pool, { schema });
+/**
+ * Behaves exactly like a drizzle instance, but the first property access is
+ * what opens the pool — so importing this module is free.
+ */
+export const db = new Proxy({} as NodePgDatabase, {
+  get(_target, prop, receiver) {
+    const value = Reflect.get(connection(), prop, receiver);
+    return typeof value === "function" ? value.bind(connection()) : value;
+  },
+}) as NodePgDatabase;
+
 export { schema };
