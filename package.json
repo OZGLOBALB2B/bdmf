@@ -2,6 +2,9 @@
   "name": "bdmf",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,7 +14,8 @@
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
     "oz:grant": "tsx --env-file=.env.local scripts/make-platform-admin.ts",
-    "db:migrate": "tsx scripts/migrate.ts"
+    "db:migrate": "tsx scripts/migrate.ts",
+    "deploy": "./scripts/deploy.sh"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",
@@ -36,6 +40,7 @@
     "eslint-config-next": "16.3.4",
     "tailwindcss": "^4",
     "tsx": "^4.23.13",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vercel": "^59.15.1"
   }
 }
