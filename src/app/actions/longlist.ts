@@ -81,7 +81,13 @@ export async function moveLongListItem(projectId: string, itemId: string, delta:
 
 /* --------------------------------------------------------- invitations */
 
-export type InviteResult = { sent: string[]; skipped: { email: string; why: string }[]; error?: string };
+export type InviteResult = {
+  sent: string[];
+  /** Accepted by us but rejected by the mail provider — nobody received these. */
+  undelivered: { email: string; why: string }[];
+  skipped: { email: string; why: string }[];
+  error?: string;
+};
 
 /**
  * Invites people to score. Locking happens here rather than as a separate
@@ -98,11 +104,17 @@ export async function inviteToScore(
   const items = await loadLongList(v.id);
 
   if (items.filter((i) => i.title.trim()).length < 2) {
-    return { sent: [], skipped: [], error: "Write at least two initiatives before inviting anyone." };
+    return {
+      sent: [],
+      undelivered: [],
+      skipped: [],
+      error: "Write at least two initiatives before inviting anyone.",
+    };
   }
 
   const emails = [...new Set(rawEmails.map((e) => e.trim().toLowerCase()).filter(Boolean))];
   const sent: string[] = [];
+  const undelivered: { email: string; why: string }[] = [];
   const skipped: { email: string; why: string }[] = [];
 
   for (const email of emails) {
@@ -137,6 +149,9 @@ export async function inviteToScore(
       continue;
     }
 
+    // Created as a draft and only promoted to "sent" once the provider has
+    // actually accepted it — otherwise the tracker would show "Invited" for
+    // someone who never received anything.
     const token = newToken();
     const [a] = await db
       .insert(assignments)
@@ -146,14 +161,13 @@ export async function inviteToScore(
         userId: user.id,
         longListVersionId: v.id,
         tokenHash: hashToken(token),
-        status: "sent",
+        status: "draft",
         message: message.trim() || null,
-        sentAt: new Date(),
         expiresAt: new Date(Date.now() + INVITE_DAYS * 864e5),
       })
       .returning({ id: assignments.id });
 
-    await send(
+    const delivery = await send(
       scoringInvite({
         to: email,
         projectName: ctx.project.name,
@@ -164,6 +178,16 @@ export async function inviteToScore(
         assignmentId: a.id,
       }),
     );
+
+    if (!delivery.ok) {
+      undelivered.push({ email, why: delivery.error ?? "the mail provider rejected it" });
+      continue;
+    }
+
+    await db
+      .update(assignments)
+      .set({ status: "sent", sentAt: new Date() })
+      .where(eq(assignments.id, a.id));
     sent.push(email);
   }
 
@@ -181,7 +205,7 @@ export async function inviteToScore(
   }
 
   revalidatePath(`/p/${projectId}/longlist`);
-  return { sent, skipped };
+  return { sent, undelivered, skipped };
 }
 
 /** Rate-limited so a reminder cannot be fired repeatedly by accident. */
@@ -211,13 +235,11 @@ export async function sendReminder(formData: FormData) {
     .update(assignments)
     .set({
       tokenHash: hashToken(token),
-      remindersSent: row.a.remindersSent + 1,
-      lastReminderAt: new Date(),
       expiresAt: new Date(Date.now() + INVITE_DAYS * 864e5),
     })
     .where(eq(assignments.id, assignmentId));
 
-  await send(
+  const delivery = await send(
     reminderMail({
       to: row.email,
       projectName: ctx.project.name,
@@ -226,6 +248,19 @@ export async function sendReminder(formData: FormData) {
       assignmentId,
     }),
   );
+
+  // The counter only moves when something actually went out, so "2 reminders
+  // sent" in the tracker means two reminders arrived.
+  if (!delivery.ok) {
+    revalidatePath(`/p/${projectId}/longlist`);
+    revalidatePath(`/p/${projectId}/deepdive`);
+    return;
+  }
+
+  await db
+    .update(assignments)
+    .set({ remindersSent: row.a.remindersSent + 1, lastReminderAt: new Date() })
+    .where(eq(assignments.id, assignmentId));
 
   await db.insert(auditEvents).values({
     workspaceId: ctx.workspaceId,

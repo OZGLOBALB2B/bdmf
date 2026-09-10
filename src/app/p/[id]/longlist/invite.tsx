@@ -69,6 +69,20 @@ export function InvitePanel({
                     </div>
                   </>
                 )}
+                {result.undelivered.length > 0 && (
+                  <div className="err" style={{ marginTop: 14 }}>
+                    <strong>
+                      {result.undelivered.length} could not be delivered — nobody received these.
+                    </strong>
+                    <div style={{ marginTop: 6 }}>
+                      {result.undelivered.map((u) => u.email).join(", ")}
+                    </div>
+                    <div style={{ marginTop: 8, fontSize: 12 }}>{result.undelivered[0].why}</div>
+                    <div style={{ marginTop: 8, fontSize: 12 }}>
+                      They are listed as not sent, so you can try again once mail is working.
+                    </div>
+                  </div>
+                )}
                 {result.skipped.length > 0 && (
                   <div className="note warn" style={{ marginTop: 14 }}>
                     Skipped: {result.skipped.map((s) => `${s.email} (${s.why})`).join(", ")}

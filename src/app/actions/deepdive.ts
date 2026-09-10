@@ -137,20 +137,19 @@ export async function sendTasks(formData: FormData) {
     .innerJoin(longListItems, eq(longListItems.id, shortlistItems.longListItemId))
     .where(where);
 
+  let delivered = 0;
   for (const a of pending) {
     const token = newToken();
     await db
       .update(assignments)
       .set({
         tokenHash: hashToken(token),
-        status: "sent",
-        sentAt: new Date(),
         message: message.trim() || null,
         expiresAt: new Date(Date.now() + INVITE_DAYS * 864e5),
       })
       .where(eq(assignments.id, a.id));
 
-    await send(
+    const delivery = await send(
       questionnaireInvite({
         to: a.email,
         projectName: ctx.project.name,
@@ -161,15 +160,25 @@ export async function sendTasks(formData: FormData) {
         assignmentId: a.id,
       }),
     );
+
+    // Left as a draft when the provider rejects it, so the tracker keeps
+    // saying "Not sent yet" and the admin can try again once mail works.
+    if (!delivery.ok) continue;
+
+    await db
+      .update(assignments)
+      .set({ status: "sent", sentAt: new Date() })
+      .where(eq(assignments.id, a.id));
+    delivered++;
   }
 
-  if (pending.length) {
+  if (delivered) {
     await db.insert(auditEvents).values({
       workspaceId: ctx.workspaceId,
       projectId,
       actorId: ctx.user.id,
       action: "stage4.tasks_sent",
-      detail: { count: pending.length },
+      detail: { count: delivered, attempted: pending.length },
     });
   }
   revalidatePath(`/p/${projectId}/deepdive`);
