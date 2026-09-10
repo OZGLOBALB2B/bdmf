@@ -39,6 +39,7 @@ export type CurrentUser = {
   email: string;
   name: string | null;
   isPlatformAdmin: boolean;
+  emailVerifiedAt: Date | null;
 };
 
 /** The signed-in user, or null. Never throws. */
@@ -53,6 +54,7 @@ export async function currentUser(): Promise<CurrentUser | null> {
       email: users.email,
       name: users.name,
       isPlatformAdmin: users.isPlatformAdmin,
+      emailVerifiedAt: users.emailVerifiedAt,
       deactivatedAt: users.deactivatedAt,
     })
     .from(sessions)
@@ -61,7 +63,13 @@ export async function currentUser(): Promise<CurrentUser | null> {
     .limit(1);
 
   if (!row || row.deactivatedAt) return null;
-  return { id: row.id, email: row.email, name: row.name, isPlatformAdmin: row.isPlatformAdmin };
+  return {
+    id: row.id,
+    email: row.email,
+    name: row.name,
+    isPlatformAdmin: row.isPlatformAdmin,
+    emailVerifiedAt: row.emailVerifiedAt,
+  };
 }
 
 /* ----------------------------------------------------------- memberships */

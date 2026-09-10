@@ -94,6 +94,33 @@ export function questionnaireInvite(o: {
   };
 }
 
+export function verifyEmail(o: {
+  to: string;
+  name: string | null;
+  token: string;
+}): Mail {
+  const href = `${APP()}/verify/${o.token}`;
+  return {
+    to: o.to,
+    template: "verify_email",
+    subject: "Confirm your email address for BDMF",
+    html: shell(
+      "Confirm your email address",
+      `<p style="margin:0 0 12px">${o.name ? escapeHtml(o.name) + ", a" : "A"} BDMF workspace was just created with this address.</p>
+       <p style="margin:0">Confirm it to open the workspace. The link is good for 24 hours.</p>`,
+      { label: "Confirm my email", href },
+    ),
+    text: plain([
+      `${o.name ? o.name + ", a" : "A"} BDMF workspace was just created with this address.`,
+      `Confirm it to open the workspace. The link is good for 24 hours.`,
+      ``,
+      href,
+      ``,
+      `If this was not you, ignore this email — the workspace stays locked without it.`,
+    ]),
+  };
+}
+
 export function reminder(o: {
   to: string;
   projectName: string;

@@ -5,6 +5,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users, workspaces, memberships, auditEvents } from "@/db/schema";
 import { hashPassword, verifyPassword, createSession, destroySession } from "@/lib/auth";
+import { issueVerification } from "@/lib/verification";
 
 export type AuthState = { error?: string; notice?: string };
 
@@ -33,7 +34,7 @@ export async function register(_prev: AuthState, form: FormData): Promise<AuthSt
   const userId = await db.transaction(async (tx) => {
     const [user] = await tx
       .insert(users)
-      .values({ email, name, passwordHash, emailVerifiedAt: new Date() })
+      .values({ email, name, passwordHash })
       .returning({ id: users.id });
     const [ws] = await tx
       .insert(workspaces)
@@ -50,7 +51,11 @@ export async function register(_prev: AuthState, form: FormData): Promise<AuthSt
   });
 
   await createSession(userId);
-  redirect("/");
+
+  // The session exists but is not much use yet: every workspace page redirects
+  // to /verify until the address is confirmed.
+  await issueVerification(userId, email, name);
+  redirect("/verify");
 }
 
 export async function login(_prev: AuthState, form: FormData): Promise<AuthState> {

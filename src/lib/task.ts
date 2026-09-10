@@ -12,6 +12,7 @@ import {
   questionnaireResponses,
 } from "@/db/schema";
 import { hashToken } from "./auth";
+import { markVerifiedByLink } from "./verification";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -159,14 +160,21 @@ export async function resolveTask(token: string, viewerId?: string): Promise<Res
   };
 }
 
-/** Records the first open, so the admin's tracker can tell "sent" from "seen". */
-export async function markOpened(assignmentId: string, status: string) {
+/**
+ * Records the first open, so the admin's tracker can tell "sent" from "seen".
+ *
+ * Following the link also proves the person controls the address it was sent
+ * to, so their email is marked confirmed here rather than making them prove
+ * the same thing a second time.
+ */
+export async function markOpened(assignmentId: string, status: string, userId?: string) {
   if (status === "sent") {
     await db
       .update(assignments)
       .set({ status: "opened", openedAt: new Date() })
       .where(and(eq(assignments.id, assignmentId), eq(assignments.status, "sent")));
   }
+  if (userId) await markVerifiedByLink(userId);
 }
 
 /** Resolves a token to an assignment for a write, or throws. */

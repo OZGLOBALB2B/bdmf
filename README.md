@@ -42,7 +42,14 @@ npm run dev
 
 With `RESEND_API_KEY` unset, every email is printed to the server console and
 recorded in `mail_log` — all invitation and reminder flows stay testable without
-sending anything. With `ANTHROPIC_API_KEY` unset, Stage 4 summaries fall back to
+sending anything. Email **verification** is the exception: a confirmation link
+that cannot be delivered is not shown on screen either, since that would let
+anyone confirm an address they do not own. Without a mail provider, confirm an
+account from the server instead:
+
+```bash
+npm run verify -- someone@example.com
+``` With `ANTHROPIC_API_KEY` unset, Stage 4 summaries fall back to
 a deterministic summariser rather than failing.
 
 ## Published documentation

@@ -36,7 +36,7 @@ export default async function TaskPage({ params }: { params: Promise<{ token: st
     );
   }
 
-  await markOpened(task.assignment.id, task.assignment.status);
+  await markOpened(task.assignment.id, task.assignment.status, task.assignment.userId);
   const submitted = task.assignment.status === "submitted";
   const who = task.person.name || task.person.email;
 

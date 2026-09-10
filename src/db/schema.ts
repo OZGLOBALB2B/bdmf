@@ -101,6 +101,28 @@ export const sessions = pgTable(
 
 /* --------------------------------------------------------------- projects */
 
+/**
+ * Email verification. One live token per user; the row is replaced when a new
+ * link is requested, so an older link stops working the moment a newer one is
+ * sent. Stored hashed, like every other token in this system.
+ */
+export const verificationTokens = pgTable(
+  "verification_tokens",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    sentAt: timestamp("sent_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("verification_tokens_user_key").on(t.userId),
+    uniqueIndex("verification_tokens_token_key").on(t.tokenHash),
+  ],
+);
+
 export const projects = pgTable(
   "projects",
   {

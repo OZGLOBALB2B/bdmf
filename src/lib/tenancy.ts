@@ -18,10 +18,17 @@ export type AdminContext = {
   workspaceName: string;
 };
 
-/** Requires a signed-in user. Redirects to login otherwise. */
+/**
+ * Requires a signed-in user whose email address has been confirmed.
+ *
+ * Unconfirmed accounts hold a valid session but reach nothing: every workspace
+ * page sends them to /verify. That page uses currentUser() directly rather
+ * than this guard, or it would redirect to itself.
+ */
 export async function requireUser(): Promise<CurrentUser> {
   const user = await currentUser();
   if (!user) redirect("/login");
+  if (!user.emailVerifiedAt) redirect("/verify");
   return user;
 }
 

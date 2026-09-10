@@ -15,7 +15,8 @@
     "db:generate": "drizzle-kit generate",
     "oz:grant": "tsx --env-file=.env.local scripts/make-platform-admin.ts",
     "db:migrate": "tsx scripts/migrate.ts",
-    "deploy": "./scripts/deploy.sh"
+    "deploy": "./scripts/deploy.sh",
+    "verify": "tsx --env-file=.env.local scripts/verify-email.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.124.0",

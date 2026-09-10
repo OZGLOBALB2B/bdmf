@@ -63,10 +63,6 @@ in with an account, `/tasks` lists only their own assignments.
 the scale allows 2 and 4. Restricting to three values would change the
 distribution and the ranking.
 
-**Email verification is not enforced.** Registration marks the account verified
-immediately. The PRS requires verification before access to client data. This is
-the largest known gap and should close before any real client data is entered.
-
 **Reminder rate limit is one per person per day**, and reminders reissue the
 link (the original token is only stored hashed and cannot be read back).
 
@@ -89,6 +85,26 @@ soft-delete with a 30-day restore window is the usual answer.
 **OZ staff cannot read client content.** The `/oz` back office shows metadata and
 operational status. A support-access path into client strategy content would need
 an explicit, audited impersonation flow — deliberately not built.
+
+## Email verification — closed
+
+Registration no longer self-verifies. A new password account holds a valid
+session but reaches nothing: every workspace route redirects to `/verify` until
+the address is confirmed. The link is a single-purpose token, stored hashed,
+good for 24 hours, replaced whenever a new one is requested, and consumed on
+use. Opening it also signs the person in, so confirming from a phone does not
+strand them.
+
+**Contributors are deliberately exempt.** They reach their task through a link
+sent to their address, so opening it already proves control of that inbox;
+their address is marked confirmed at that moment rather than making them prove
+the same thing twice.
+
+**A deployment with no mail provider cannot verify anyone.** That is intended:
+showing the link on screen instead would let someone confirm an address they do
+not control, which is the entire thing this guards. Such an installation gets a
+clear message and an operator escape hatch, `npm run verify -- <email>`. Set
+`RESEND_API_KEY` and the normal flow takes over.
 
 ## Knowingly out of scope for this version
 
