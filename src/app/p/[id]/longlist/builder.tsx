@@ -64,7 +64,8 @@ function Editable({
           placeholder="Initiative name"
           onChange={(e) => queue({ title: e.target.value })}
           onBlur={flush}
-          style={{ border: 0, padding: 0, fontWeight: 500, fontSize: 13.5, boxShadow: "none" }}
+          className="inline-edit"
+          style={{ fontWeight: 500, fontSize: 13.5 }}
         />
         <textarea
           rows={1}
@@ -73,7 +74,8 @@ function Editable({
           placeholder="One line on what it means"
           onChange={(e) => queue({ description: e.target.value })}
           onBlur={flush}
-          style={{ border: 0, padding: 0, marginTop: 2, color: "var(--muted)", fontSize: 12, boxShadow: "none" }}
+          className="inline-edit"
+          style={{ marginTop: 2, color: "var(--muted)", fontSize: 12 }}
         />
       </td>
       <td style={{ width: 230 }}>

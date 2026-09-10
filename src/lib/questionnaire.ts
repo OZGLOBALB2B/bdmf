@@ -171,6 +171,44 @@ export function missingAnswers(a: Answers): Question[] {
 }
 
 /**
+ * Why a question still counts as unanswered, in the words of the person
+ * filling it in. "Still to answer: 9" is true but useless when the row has a
+ * likelihood and a counter-measure and only the risk itself is blank.
+ */
+/** "1", "1 and 2", "1, 2 and 3" — never "1 and 2 and 3". */
+const list = (n: number[]) =>
+  n.length <= 1 ? String(n[0] ?? "") : `${n.slice(0, -1).join(", ")} and ${n.at(-1)}`;
+
+export function missingDetail(q: Question, a: Answers): string {
+  switch (q.type) {
+    case "milestones": {
+      const done = filledMilestones(a.milestones).length;
+      return done === 0
+        ? "name at least four milestones"
+        : `${4 - done} more milestone${4 - done === 1 ? "" : "s"} needed`;
+    }
+    case "metrics":
+      return "give at least one success metric";
+    case "risks": {
+      const rows = a.risks ?? [];
+      const named = filledRisks(rows).length;
+      const started = rows
+        .map((r, i) => ({ r, i }))
+        .filter(({ r }) => !r.risk.trim() && (r.likelihood || r.counter.trim()))
+        .map(({ i }) => i + 1);
+      if (started.length) {
+        return `row${started.length === 1 ? "" : "s"} ${list(started)} need${
+          started.length === 1 ? "s" : ""
+        } the risk itself named`;
+      }
+      return `name ${3 - named} more risk${3 - named === 1 ? "" : "s"}`;
+    }
+    default:
+      return "still empty";
+  }
+}
+
+/**
  * How many of the ten carry no answer at all — including question 10, which is
  * optional and so never appears in missingAnswers(). The footer counts out of
  * ten, so it has to count all ten or the figure contradicts the page.

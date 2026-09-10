@@ -90,7 +90,8 @@ function ItemCard({
           placeholder="Give it a name"
           onChange={(e) => queue({ title: e.target.value })}
           onBlur={flush}
-          style={{ border: 0, padding: 0, fontWeight: 500, fontSize: 14, boxShadow: "none" }}
+          className="inline-edit"
+          style={{ fontWeight: 500, fontSize: 14 }}
         />
         {!locked && (
           <>
@@ -121,7 +122,8 @@ function ItemCard({
         placeholder="A sentence or two on what it means"
         onChange={(e) => queue({ body: e.target.value })}
         onBlur={flush}
-        style={{ border: 0, padding: 0, marginTop: 5, color: "var(--muted)", fontSize: 12.5, boxShadow: "none" }}
+        className="inline-edit"
+        style={{ marginTop: 5, color: "var(--muted)", fontSize: 12.5 }}
       />
 
       {item.subs.length > 0 && (
@@ -203,7 +205,8 @@ function SubItem({
         placeholder="Sub-initiative"
         onChange={(e) => queue({ title: e.target.value })}
         onBlur={flush}
-        style={{ border: 0, padding: "2px 0", fontSize: 12.5, color: "var(--muted)", boxShadow: "none" }}
+        className="inline-edit"
+        style={{ fontSize: 12.5, color: "var(--muted)" }}
       />
       {!locked && (
         <button

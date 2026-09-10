@@ -17,7 +17,7 @@ import {
 import { assignmentForToken } from "@/lib/task";
 import { currentUser } from "@/lib/auth";
 import { CRITERIA } from "@/lib/scoring";
-import { missingAnswers, TEMPLATE_VERSION, type Answers } from "@/lib/questionnaire";
+import { missingAnswers, missingDetail, TEMPLATE_VERSION, type Answers } from "@/lib/questionnaire";
 import { send } from "@/lib/mail";
 import { submissionReceipt } from "@/lib/mail/templates";
 import { summarize } from "@/lib/ai/summarize";
@@ -122,7 +122,9 @@ export async function submitAnswers(token: string, answers: Answers): Promise<{ 
   const missing = missingAnswers(answers);
   if (missing.length) {
     return {
-      error: `Still to answer: ${missing.map((q) => `${q.n}. ${q.label.replace(/\?$/, "")}`).join("; ")}.`,
+      error: `Still to answer — ${missing
+        .map((q) => `${q.n}. ${q.label} (${missingDetail(q, answers)})`)
+        .join("; ")}.`,
     };
   }
 

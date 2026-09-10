@@ -258,3 +258,33 @@ tr.below td { background: var(--ground); color: var(--muted); }
   margin-bottom: 4px;
 }
 .provenance p { font-size: 12.5px; color: var(--ink2); }
+
+/* ---------------------------------------------------------------------
+   Fields that sit inside a card or a table and should not carry a heavy
+   border. They still have to look editable: a borderless input reads as a
+   heading, which is exactly how question 9's risk field was missed.
+   Empty ones show a faint dotted underline; hover and focus give a real
+   outline.
+   --------------------------------------------------------------------- */
+input.inline-edit, textarea.inline-edit {
+  border: 0;
+  padding: 3px 4px;
+  margin-left: -4px;
+  background: none;
+  border-radius: 5px;
+  box-shadow: none;
+  border-bottom: 1px dashed var(--line);
+}
+input.inline-edit:hover:not(:disabled), textarea.inline-edit:hover:not(:disabled) { background: var(--ground); border-bottom-color: var(--accent-line); }
+input.inline-edit:focus, textarea.inline-edit:focus {
+  background: var(--paper);
+  border-bottom-style: solid;
+  border-bottom-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  outline: none;
+}
+input.inline-edit:disabled, textarea.inline-edit:disabled { border-bottom-color: transparent; }
+/* a filled field needs less prompting than an empty one */
+input.inline-edit:not(:placeholder-shown), textarea.inline-edit:not(:placeholder-shown) { border-bottom-color: transparent; }
+input.inline-edit:not(:placeholder-shown):hover:not(:disabled),
+textarea.inline-edit:not(:placeholder-shown):hover:not(:disabled) { border-bottom-color: var(--accent-line); }

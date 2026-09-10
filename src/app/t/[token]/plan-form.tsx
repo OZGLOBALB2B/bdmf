@@ -218,22 +218,26 @@ export function PlanForm({
                   <td>
                     <input type="text" value={m.what} placeholder="What gets finished"
                       onChange={(e) => setMilestone(i, { what: e.target.value })}
-                      style={{ border: 0, padding: 0, boxShadow: "none", fontSize: 13 }} />
+                      className="inline-edit"
+                      style={{ fontSize: 13 }} />
                   </td>
                   <td>
                     <input type="date" value={m.date}
                       onChange={(e) => setMilestone(i, { date: e.target.value })}
-                      style={{ border: 0, padding: 0, boxShadow: "none", fontSize: 12.5 }} />
+                      className="inline-edit"
+                      style={{ fontSize: 12.5 }} />
                   </td>
                   <td>
                     <input type="text" value={m.leader} placeholder="Name"
                       onChange={(e) => setMilestone(i, { leader: e.target.value })}
-                      style={{ border: 0, padding: 0, boxShadow: "none", fontSize: 12.5 }} />
+                      className="inline-edit"
+                      style={{ fontSize: 12.5 }} />
                   </td>
                   <td>
                     <input type="text" value={m.done} placeholder="The test for done"
                       onChange={(e) => setMilestone(i, { done: e.target.value })}
-                      style={{ border: 0, padding: 0, boxShadow: "none", fontSize: 12.5 }} />
+                      className="inline-edit"
+                      style={{ fontSize: 12.5 }} />
                   </td>
                 </tr>
               ))}
@@ -270,30 +274,68 @@ export function PlanForm({
       </Q>
 
       <Q n={9}>
-        {(a.risks ?? []).map((r, i) => (
-          <div key={i} className="card pad" style={{ padding: "11px 13px", marginBottom: 8 }}>
-            <div className="row" style={{ alignItems: "flex-start" }}>
-              <span className="lab" style={{ width: 16, paddingTop: 8 }}>{i + 1}</span>
-              <div style={{ flex: 1 }}>
-                <input type="text" value={r.risk} placeholder="The risk"
-                  onChange={(e) => setRisk(i, { risk: e.target.value })}
-                  style={{ border: 0, padding: 0, boxShadow: "none", fontSize: 13 }} />
-                <div className="row" style={{ marginTop: 6 }}>
-                  <select value={r.likelihood} onChange={(e) => setRisk(i, { likelihood: e.target.value })}
-                    style={{ width: 130, fontSize: 12.5, padding: "5px 8px" }}>
-                    <option value="">Likelihood…</option>
-                    <option value="Low">Low</option>
-                    <option value="Moderate">Moderate</option>
-                    <option value="High">High</option>
-                  </select>
-                  <input type="text" value={r.counter} placeholder="Counter-measure, in one line"
-                    onChange={(e) => setRisk(i, { counter: e.target.value })}
-                    style={{ fontSize: 12.5, padding: "5px 8px" }} />
+        {(a.risks ?? []).map((r, i) => {
+          // A row with a likelihood or a counter-measure but no risk named is
+          // the one that silently blocked submission, so it says so here
+          // rather than only in the error at the bottom of the page.
+          const started = Boolean(r.likelihood || r.counter.trim());
+          const needsRisk = started && !r.risk.trim();
+          return (
+            <div key={i} className="card pad" style={{ padding: "13px 15px", marginBottom: 8 }}>
+              <div className="row" style={{ alignItems: "flex-start" }}>
+                <span className="lab" style={{ width: 16, paddingTop: 22 }}>{i + 1}</span>
+                <div style={{ flex: 1 }}>
+                  <label className="lab" htmlFor={`risk-${i}`}>What could go wrong</label>
+                  <input
+                    id={`risk-${i}`}
+                    type="text"
+                    value={r.risk}
+                    placeholder="Name the risk"
+                    onChange={(e) => setRisk(i, { risk: e.target.value })}
+                    style={
+                      needsRisk
+                        ? { fontSize: 13, borderColor: "var(--danger)" }
+                        : { fontSize: 13 }
+                    }
+                  />
+                  {needsRisk && (
+                    <div className="lab" style={{ color: "var(--danger)", marginTop: 4 }}>
+                      Name the risk itself — the rest of this row is filled in.
+                    </div>
+                  )}
+
+                  <div className="row" style={{ marginTop: 10, alignItems: "flex-end" }}>
+                    <div style={{ width: 140, flex: "none" }}>
+                      <label className="lab" htmlFor={`likelihood-${i}`}>Likelihood</label>
+                      <select
+                        id={`likelihood-${i}`}
+                        value={r.likelihood}
+                        onChange={(e) => setRisk(i, { likelihood: e.target.value })}
+                        style={{ fontSize: 12.5, padding: "8px 9px" }}
+                      >
+                        <option value="">Choose…</option>
+                        <option value="Low">Low</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                      </select>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label className="lab" htmlFor={`counter-${i}`}>Counter-measure</label>
+                      <input
+                        id={`counter-${i}`}
+                        type="text"
+                        value={r.counter}
+                        placeholder="What you will do about it, in one line"
+                        onChange={(e) => setRisk(i, { counter: e.target.value })}
+                        style={{ fontSize: 12.5, padding: "8px 9px" }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </Q>
 
       <Q n={10}>
